@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.TripMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Trip">
+        <result column="tripid" property="tripid" />
+        <result column="userid" property="userid" />
+        <result column="brideadress" property="brideadress" />
+        <result column="groomadress" property="groomadress" />
+        <result column="hoteladress" property="hoteladress" />
+        <result column="marrytime" property="marrytime" />
+        <result column="hour" property="hour" />
+        <result column="kilometre" property="kilometre" />
+        <result column="marrystage" property="marrystage" />
+        <result column="bridejwd" property="bridejwd" />
+        <result column="groomjwd" property="groomjwd" />
+        <result column="hoteljwd" property="hoteljwd" />
+    </resultMap>
+    <select id="selectList" resultMap="BaseResultMap">
+        select tripid,userid,brideadress,groomadress,hoteladress,marrytime,hour,kilometre,marrystage,bridejwd,groomjwd,hoteljwd from trip where userid=#{userid}
+    </select>
+</mapper>

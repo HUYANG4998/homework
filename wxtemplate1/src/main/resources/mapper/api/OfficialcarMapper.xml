@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.OfficialcarMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Officialcar">
+        <id column="carid" property="carid" />
+        <result column="cardesc" property="cardesc" />
+        <result column="carcolor" property="carcolor" />
+        <result column="carmodel" property="carmodel" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+        <result column="userid" property="userid" />
+        <result column="carnumber" property="carnumber" />
+        <result column="brandid" property="brandid" />
+        <result column="cartype" property="cartype" />
+        <result column="sumnum" property="sumnum" />
+        <result column="carprice" property="carprice" />
+        <result column="sales" property="sales" />
+        <result column="seat" property="seat" />
+        <result column="type" property="type" />
+        <result column="status" property="status" />
+        <result column="overtimeprice" property="overtimeprice" />
+    </resultMap>
+
+    <select id="selectofficialcar" resultType="java.util.Map" parameterType="java.util.Map">
+
+            select o.carid,o.cardesc,o.carcolor,o.carprice,o.carmodel,o.addtime,o.updatetime,o.carnumber,o.brandid,o.cartype,o.sumnum,o.sales,o.seat,o.type,i.imgurl
+
+            from officialcar o left join brand b on o.brandid=b.brandid
+            left join imgs i on o.carid=i.objid
+            <where>
+              <if test="type !=null and type !=''">and o.type=#{type}</if>
+              <if test="brand !=null and brand !=''">and o.brandid in(select brandid
+                  from brand where firstletter=#{brand})</if>
+            </where>
+          <if test="order !=null and order !=''">
+            <if test="order=='1'.toString ">order by o.carid</if>
+            <if test="order=='2'.toString ">order by o.carprice </if>
+            <if test="order=='3'.toString ">order by o.carprice  desc</if>
+            <if test="order=='4'.toString ">order by o.sales desc </if>
+           </if>
+    </select>
+    <select id="selectofficialcarByStatus" resultType="java.util.Map" parameterType="java.lang.String">
+         select o.carid,o.cardesc,o.carcolor,o.carprice,o.carmodel,o.addtime,o.updatetime,o.carnumber,o.brandid,o.cartype,o.sumnum,o.sales,o.seat,o.type,i.imgurl,o.status
+            from officialcar o
+            left join imgs i on o.carid=i.objid
+            ORDER BY RAND() LIMIT 4
+    </select>
+    <select id="selectofficialcarByCarId" resultType="java.util.Map" parameterType="java.lang.String">
+        select o.carid,o.cardesc,o.carcolor,o.carprice,o.carmodel,o.addtime,o.updatetime,o.carnumber,o.brandid,o.cartype,o.sumnum,o.sales,o.seat,o.type,i.imgurl,o.status,o.overtimeprice
+            from officialcar o
+            left join imgs i on o.carid=i.objid
+            where o.carid=#{carid}
+    </select>
+    <select id="selectAllofficialcar" resultType="java.util.Map" parameterType="java.lang.String">
+        select o.carid,o.cardesc,o.carcolor,o.carprice,o.carmodel,o.addtime,o.updatetime,o.carnumber,o.brandid,o.cartype,o.sumnum,o.sales,o.seat,o.type,i.imgurl,
+        case o.status
+        when 0 then '好车推荐'
+        when 1 then '热门车型'
+        else '普通车型'
+        end status
+            from officialcar o left join brand b on o.brandid=b.brandid
+            left join imgs i on o.carid=i.objid
+            <where>
+                <if test="cartype!=null and cartype!=''">
+                    cartype like concat('%',#{cartype},'%')
+                </if>
+            </where>
+            order by o.status asc
+    </select>
+
+</mapper>

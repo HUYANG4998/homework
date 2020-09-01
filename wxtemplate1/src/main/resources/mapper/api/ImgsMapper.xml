@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.ImgsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Imgs">
+        <id column="imgsid" property="imgsid" />
+        <result column="imgurl" property="imgurl" />
+        <result column="addtime" property="addtime" />
+        <result column="objid" property="objid" />
+    </resultMap>
+    <delete id="deleteByObjId" parameterType="java.lang.String">
+        delete from imgs where objid=#{carid}
+    </delete>
+    <update id="updateByCarid" parameterType="com.wxtemplate.api.entity.Imgs">
+        update imgs
+        <set>
+            <if test="imgurl != null and imgurl !=''">imgurl = #{imgurl},</if>
+        </set>
+        where
+        objid=#{objid}
+    </update>
+    <select id="selectByObjId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select imgsid,imgurl,objid from imgs where objid=#{objid}
+    </select>
+</mapper>

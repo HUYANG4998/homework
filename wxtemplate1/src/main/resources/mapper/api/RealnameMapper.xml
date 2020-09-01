@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.RealnameMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Realname">
+        <id column="realnameid" property="realnameid" />
+        <result column="idcard" property="idcard" />
+        <result column="realname" property="realname" />
+        <result column="userid" property="userid" />
+        <result column="addtime" property="addtime" />
+        <result column="realstatus" property="realstatus" />
+        <result column="updatetime" property="updatetime" />
+        <result column="cause" property="cause" />
+    </resultMap>
+
+    <select id="selectRealNameByUserId" parameterType="java.lang.String" resultType="java.util.Map">
+        select r.realnameid,r.idcard,r.realname,r.userid,r.addtime,r.realstatus,r.updatetime,i.imgurl
+        from realname r left join imgs i on r.realnameid=i.objid where r.userid=#{userid}
+    </select>
+    <select id="selectAllRealName" resultType="java.util.Map" parameterType="java.lang.String">
+        select r.realnameid,r.idcard,r.realname,
+        r.realstatus status
+        from realname r
+        <where>
+            <if test="realname!=null and realname!=''">
+                realname like concat('%',#{realname},'%')
+            </if>
+        </where>
+        order by r.realstatus asc,r.addtime desc
+    </select>
+    <select id="selectRealnameByRealnameId" parameterType="java.lang.String" resultType="java.util.Map">
+        select r.realnameid,r.idcard,r.realname,r.realstatus status,r.cause,
+        i.imgurl imgurl
+        from realname r left join imgs i on r.realnameid=i.objid
+        where r.realnameid=#{realnameid}
+
+    </select>
+    <select id="selectRealByUserId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select realnameid,idcard,realname,userid,addtime,realstatus,updatetime,cause
+        from realname where userid=#{userid}
+    </select>
+</mapper>

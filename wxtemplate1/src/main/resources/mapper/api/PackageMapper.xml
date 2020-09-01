@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.PackageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Package">
+        <id column="packageid" property="packageid" />
+        <result column="main_id" property="mainId" />
+        <result column="main_color" property="mainColor" />
+        <result column="deputy_id" property="deputyId" />
+        <result column="deputy_color" property="deputyColor" />
+        <result column="deputy_number" property="deputyNumber" />
+        <result column="price" property="price" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="selectPackage" resultType="java.util.Map">
+        select p.packageid,p.main_id,(select color from carcolor where carcolorid=p.main_color) main_color,p.deputy_id,(select color from carcolor where carcolorid=p.deputy_color) deputy_color,p.deputy_number,p.price,i.imgurl,o1.carmodel main_carmodel,o1.cartype main_cartype,o2.carmodel deputy_carmodel,o2.cartype deputy_cartype
+        from package p left join imgs i on p.packageid=i.objid left join officialcar o1 on o1.carid=p.main_id left join officialcar o2 on o2.carid=p.deputy_id
+
+    </select>
+    <select id="selectPackageById" parameterType="java.lang.String" resultType="java.util.Map">
+        select p.packageid,p.main_id,p.deputy_id,p.deputy_number,p.price,i.imgurl,o1.carmodel main_carmodel,o1.cartype main_cartype,p.main_color,p.deputy_color,
+        o2.carmodel deputy_carmodel,o2.cartype deputy_cartype,(select color from carcolor where carcolorid=p.main_color) m_color,(select color from carcolor where carcolorid=p.deputy_color) d_color
+        from package p left join imgs i on p.packageid=i.objid left join officialcar o1 on o1.carid=p.main_id left join officialcar o2 on o2.carid=p.deputy_id where p.packageid=#{packageid}
+    </select>
+    <select id="selectPacckageFour" resultType="java.util.Map">
+        select p.packageid,p.main_id,p.main_color,p.deputy_id,p.deputy_color,p.deputy_number,p.price,i.imgurl,o1.carmodel main_carmodel,o1.cartype main_cartype,o2.carmodel deputy_carmodel,o2.cartype deputy_cartype
+        from package p left join imgs i on p.packageid=i.objid left join officialcar o1 on o1.carid=p.main_id left join officialcar o2 on o2.carid=p.deputy_id
+         where (select inventory from carcolor where carcolorid=p.main_color)>0 and (select inventory from carcolor where carcolorid=p.deputy_color)<![CDATA[ >= ]]>p.deputy_number
+         ORDER BY RAND() LIMIT 4
+    </select>
+    <select id="selectWebPackage" resultType="java.util.Map" parameterType="java.util.Map">
+        select p.packageid,p.main_id,p.main_color,p.deputy_id,p.deputy_color,p.deputy_number,p.price,i.imgurl,o1.carmodel main_carmodel,o1.cartype main_cartype,o2.carmodel deputy_carmodel,o2.cartype deputy_cartype
+        from package p left join imgs i on p.packageid=i.objid left join officialcar o1 on o1.carid=p.main_id left join officialcar o2 on o2.carid=p.deputy_id
+        <if test="order !=null and order !=''">
+            <if test="order=='1'.toString ">order by p.packageid</if>
+            <if test="order=='2'.toString ">order by p.price </if>
+            <if test="order=='3'.toString ">order by p.price desc</if>
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.NoticeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Notice">
+        <id column="noticeid" property="noticeid" />
+        <result column="content" property="content" />
+        <result column="addition" property="addition" />
+        <result column="addtime" property="addtime" />
+        <result column="userid" property="userid" />
+        <result column="isread" property="isread" />
+    </resultMap>
+    <select id="selectNotice" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select noticeid,content,addition,addtime,userid,isread
+        from notice where userid=#{userid} or userid is null order by addtime desc
+    </select>
+    <select id="selectNoticeCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from notice where (userid=#{userid} or userid is null) and isread='0'
+    </select>
+
+</mapper>

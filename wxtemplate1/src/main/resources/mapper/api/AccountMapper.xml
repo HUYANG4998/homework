@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.AccountMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Account">
+        <id column="accountid" property="accountid" />
+        <result column="userid" property="userid" />
+        <result column="ditch" property="ditch" />
+        <result column="username" property="username" />
+        <result column="money_code" property="moneyCode" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+        <result column="bank" property="bank" />
+        <result column="name" property="name" />
+    </resultMap>
+    <select id="selectAccountXHTByDitch" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select accountid,money_code from account where userid='xht_website_account' and ditch=#{ditch}
+    </select>
+    <select id="selectAccountByUseridAndDitch" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select accountid,userid,ditch,username,money_code,name,bank
+        from account
+        <where>
+            <if test="userid!=null and userid!=''">
+                and userid=#{userid}
+            </if>
+            <if test="ditch!=null and ditch!=''">
+                and ditch=#{ditch}
+            </if>
+        </where>
+    </select>
+</mapper>

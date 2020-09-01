@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.LicenseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.License">
+        <id column="licenseid" property="licenseid" />
+        <result column="licenseurl" property="licenseurl" />
+        <result column="licensenumber" property="licensenumber" />
+        <result column="addtime" property="addtime" />
+        <result column="userid" property="userid" />
+        <result column="licensestatus" property="licensestatus" />
+    </resultMap>
+
+    <select id="selectLicenseByUserId" parameterType="java.lang.String" resultType="java.util.Map">
+
+        select licenseid,licenseurl,licensenumber,addtime,userid,licensestatus from license where userid=#{userid}
+    </select>
+
+    <select id="selectAllLicense" resultType="java.util.Map" parameterType="java.lang.String">
+        select licenseid,licenseurl,licensenumber,licensestatus status
+        from license
+        <where>
+            <if test="licensenumber!=null and licensenumber!=''">
+                licensenumber like concat('%',#{licensenumber},'%')
+            </if>
+        </where>
+        order by status asc,addtime desc
+    </select>
+
+    <select id="selectLicenseByLiceseId" parameterType="java.lang.String" resultType="java.util.Map">
+        select licenseid,licenseurl,licensenumber,licensestatus status,cause
+        from license where licenseid=#{licenseid}
+    </select>
+    <select id="selectLicByUserId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select licenseid,licenseurl,licensenumber,addtime,userid,licensestatus,cause
+        from license where userid=#{userid}
+
+    </select>
+</mapper>

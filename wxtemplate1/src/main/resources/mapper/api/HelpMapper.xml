@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.HelpMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Help">
+        <id column="help_id" property="helpId" />
+        <result column="first_id" property="firstId" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+    </resultMap>
+    <select id="selectHelpStyle" resultMap="BaseResultMap">
+        select help_id,title from helper where first_id is null order by addtime
+    </select>
+    <select id="selectViceHelpById" resultType="java.util.Map">
+        select h1.help_id helpId,h1.title,h1.first_id,h2.title firstTitle from
+         helper h1 left join helper h2 on h1.first_id=h2.help_id where h1.first_id is not null and h1.content is null order by h2.title desc,h1.addtime
+    </select>
+    <select id="selectProHelpById" resultType="java.util.Map">
+        select h1.help_id helpId,h1.title,h1.first_id,h2.title firstTitle,h1.content content,h3.title grandTitle from
+         helper h1 left join helper h2 on h1.first_id=h2.help_id
+         left join helper h3 on h2.first_id=h3.help_id
+         where h1.first_id is not null and h1.content is not null order by h3.title desc,h1.addtime
+    </select>
+    <select id="selectByFirstId" parameterType="java.lang.String" resultType="java.lang.String">
+        select help_id from helper where first_id =#{firstId}
+    </select>
+    <select id="selectByFirstIdAll" parameterType="java.lang.String" resultMap="BaseResultMap">
+      select help_id,first_id,title,content from helper where first_id =#{firstId} order by addtime
+
+    </select>
+
+</mapper>

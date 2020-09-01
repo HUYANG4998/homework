@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.CarcolorMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Carcolor">
+        <result column="carcolorid" property="carcolorid" />
+        <result column="carid" property="carid" />
+        <result column="color" property="color" />
+        <result column="inventory" property="inventory" />
+    </resultMap>
+    <select id="selectCarColorByCarid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select carcolorid,carid,color,inventory from carcolor
+        where carid=#{carid}
+    </select>
+    <delete id="deleteCarColorByCarid" parameterType="java.lang.String">
+        delete from carcolor where carid=#{carid}
+    </delete>
+    <select id="selectCarColorByCaridAndColor" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select carcolorid,carid,color,inventory
+        from carcolor where carid=#{carid} and color=#{color}
+    </select>
+    <select id="selectCarcolorByCarid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select carcolorid,carid,color from carcolor where carid=#{carid}
+    </select>
+    <select id="deleteCarcolorOther" parameterType="java.util.Map">
+          delete from carcolor
+          where carcolorid not IN
+        <foreach collection="carcoloridList" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and carid=#{carid}
+    </select>
+</mapper>

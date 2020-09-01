@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.VersionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Version">
+        <id column="version_id" property="versionId" />
+        <result column="version_number" property="versionNumber" />
+        <result column="version_file" property="versionFile" />
+    </resultMap>
+    <select id="selectVersion" resultMap="BaseResultMap">
+        select version_id,version_number,version_file from version limit 0,1
+    </select>
+</mapper>

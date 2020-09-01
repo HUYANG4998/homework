@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.AssetMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Asset">
+        <result column="assetid" property="assetid" />
+        <result column="userid" property="userid" />
+        <result column="ditch" property="ditch" />
+        <result column="price" property="price" />
+        <result column="real_price" property="realPrice" />
+        <result column="addtime" property="addtime" />
+        <result column="status" property="status" />
+        <result column="cause" property="cause" />
+        <result column="updatetime" property="updatetime" />
+        <result column="cate" property="cate" />
+    </resultMap>
+    <select id="selectWechat" resultMap="BaseResultMap">
+        select assetid,money_code from asset where assetid='xht_website_wechat' and ditch='0'
+    </select>
+    <select id="selectAlipay" resultMap="BaseResultMap">
+        select assetid,money_code from asset where assetid='xht_website_alipay' and ditch='1'
+    </select>
+    <select id="selectAssetToAudit" resultType="java.util.Map" parameterType="java.lang.String">
+        select ass.assetid,ass.userid,ass.price,ass.real_price, case acc.ditch
+        when '0' then '微信'
+        when '1' then '支付宝'
+        else '银行卡'
+        end ditch,ass.status,acc.username,acc.money_code,acc.name,acc.bank
+				from asset ass left join account acc on ass.userid=acc.userid
+        where ass.cate=#{cate} and ass.status='0' and ass.accountid=acc.accountid
+        order by ass.addtime desc
+
+    </select>
+    <select id="selectAssetRecord" parameterType="java.lang.String" resultType="java.util.Map">
+       select ass.assetid,ass.userid,ass.price,ass.real_price, case acc.ditch
+        when '0' then '微信'
+        when '1' then '支付宝'
+        else '银行卡'
+        end ditch,ass.status,acc.username,acc.money_code
+				from asset ass left join account acc on ass.userid=acc.userid
+        where ass.cate=#{cate} and ass.status in('1','2') and ass.accountid=acc.accountid
+        order by ass.addtime desc
+    </select>
+    <select id="selectAssetByAssetId" parameterType="java.lang.String" resultType="java.util.Map">
+        select ass.assetid,ass.userid,ass.price,ass.real_price, case acc.ditch
+        when '0' then '微信'
+        when '1' then '支付宝'
+        else '银行卡'
+        end ditch,ass.status,acc.username,acc.money_code,ass.cause,acc.name,acc.bank
+				from asset ass left join account acc on ass.userid=acc.userid
+        where ass.assetid=#{assetid}and ass.accountid=acc.accountid
+    </select>
+    <select id="selectAssetByUseridAndDitch" parameterType="java.lang.String" resultType="java.util.Map">
+        select as.assetid,as.userid,a.ditch,as.username,as.money_code,as.cate
+        from asset as left join account a on as.accountid=a.accountid where as.userid=#{userid}  and as.cate='2'
+    </select>
+    <select id="selectAssetList" resultMap="BaseResultMap">
+        select assetid,userid,accountid,price,real_price,addtime,updatetime,status,cause,cate from asset
+    </select>
+</mapper>

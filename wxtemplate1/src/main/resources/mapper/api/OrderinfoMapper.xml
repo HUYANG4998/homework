@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.OrderinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Orderinfo">
+        <id column="orderinfoid" property="orderinfoid" />
+        <result column="addtime" property="addtime" />
+        <result column="orderid" property="orderid" />
+        <result column="cartype" property="cartype" />
+        <result column="carid" property="carid" />
+        <result column="price" property="price" />
+        <result column="userid" property="userid" />
+        <result column="orderpaystatus" property="orderpaystatus" />
+        <result column="carmainpaystatus" property="carmainpaystatus" />
+        <result column="status" property="status" />
+        <result column="liaisonname" property="liaisonname" />
+        <result column="liaisonphone" property="liaisonphone" />
+        <result column="type" property="type" />
+        <result column="reviewstatus" property="reviewstatus" />
+        <result column="margin" property="margin" />
+        <result column="realprice" property="realprice" />
+        <result column="cause" property="cause" />
+        <result column="is_sign" property="is_sign" />
+        <result column="updatetime" property="updatetime" />
+        <result column="settlement" property="settlement" />
+        <result column="carcolor" property="carcolor" />
+        <result column="time" property="time" />
+    </resultMap>
+    <select id="selectOrderInfoByOrderIdAndStatus" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select orderinfoid,orderid,carcolor,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,margin
+        from orderinfo
+        where orderid=#{orderid} and status=#{status}
+    </select>
+    <delete id="deleteByOrderId" parameterType="java.lang.String">
+        delete from orderinfo where orderid=#{orderid}
+    </delete>
+    <select id="selectOrderinfoByUseridAndOrderidAndType" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select orderinfoid,orderid,carcolor,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,margin,is_sign
+        from orderinfo
+        where orderid=#{orderid} and userid=#{userid} and status='0'
+    </select>
+    <select id="selectOrderByOrderinfoId" parameterType="java.lang.String" resultType="java.util.Map">
+         select o.userid,info.price,info.type
+        from orderinfo info left join orders o on o.orderid=info.orderid
+        where orderinfoid=#{orderinfoid}
+  </select>
+    <select id="selectReserveOrderinfoByOrderidAndType" parameterType="java.lang.String" resultType="java.util.Map">
+        select info.orderinfoid,o.userid,info.price
+        from orderinfo info left join orders o on o.orderid=info.orderid
+        where info.orderid=#{orderid} and info.type=#{type} and info.status='1'
+    </select>
+    <select id="selectOrderInfoByOrderId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from orderinfo
+        where orderid=#{orderid} and status='0'
+    </select>
+    <select id="selectOrderinfoByOrderid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select orderinfoid,orderid,cartype,carid,price,carmainpaystatus,status,liaisonname,liaisonphone,type
+        from orderinfo
+        where orderid=#{orderid} and status='1' and type='1'
+    </select>
+    <select id="selectCompleteOrderinfoByOrderid" parameterType="java.lang.String" resultType="java.util.Map">
+        select info.orderinfoid,info.realprice,info.cause,c.carmodel,c.carcolor,c.carnumber,u.name
+        from orderinfo info left join car c on info.carid=c.carid left join user u on info.userid=u.userid
+        where info.orderid=#{orderid} and info.status='0' and info.type=#{type}
+    </select>
+    <select id="selectOrderinfoByOrderinfoid" parameterType="java.lang.String" resultType="java.util.Map">
+        select info.orderinfoid,info.realprice,info.cause,c.carmodel,c.carcolor,c.carnumber,i.imgurl imgurl,info.price,info.margin,info.liaisonname,info.liaisonphone,u.name,info.settlement
+        from orderinfo info left join car c on info.carid=c.carid
+        left join imgs i on c.carid=i.objid left join user u on info.userid=u.userid
+        where info.orderinfoid=#{orderinfoid}
+    </select>
+    <select id="selectOrderinfoByUseridAndOrderid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select orderinfoid,addtime,orderid,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,
+        margin,realprice,cause,is_sign
+        from orderinfo
+        <where>
+            <if test="orderid!=null and orderid!=''">
+                and orderid=#{orderid}
+            </if>
+            <if test="userid!=null and userid!=''">
+                and userid=#{userid}
+            </if>
+        </where>
+          and status='0' and type='2'
+    </select>
+    <select id="selectOrderinfoCompleteByOrderid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select orderinfoid,addtime,orderid,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,
+        margin,realprice,cause,is_sign,carcolor
+        from orderinfo
+        where orderid=#{orderid} and type='2'
+    </select>
+    <select id="selectOrderinfoUserIdByOrderId" parameterType="java.lang.String" resultType="java.lang.String">
+        select distinct(userid) userid
+        from orderinfo
+        where orderid=#{orderid} and status='0' and type='3'
+    </select>
+    <select id="selectOrderinfoCompleteByUseridAndOrderid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select orderinfoid,addtime,orderid,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,
+        margin,realprice,cause,is_sign
+        from orderinfo
+        where orderid=#{orderid} and userid=#{userid} and type='3'
+    </select>
+    <select id="selectOngoing" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select orderinfoid,addtime,orderid,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,
+        margin,realprice,cause,is_sign
+        from orderinfo
+        where orderid=#{orderid} and status='0' and type='3'
+
+    </select>
+    <select id="selectOrderinfoList" resultMap="BaseResultMap">
+          select orderinfoid,addtime,orderid,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,margin,
+          realprice,cause,is_sign,updatetime,settlement form orderinfo
+          from orderinfo
+    </select>
+    <select id="selectOrderinfoOneDay" resultMap="BaseResultMap">
+         select orderinfoid,addtime,orderid,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,margin,
+          realprice,cause,is_sign,updatetime,settlement from orderinfo
+          where status='0' and type='1' and orderpaystatus='1' and carmainpaystatus='0'
+
+    </select>
+    <select id="selectOrderinfoByOrderidAndType" parameterType="java.lang.String" resultType="java.util.Map">
+        select DISTINCT(info.carid) carid,info.carcolor,info.cartype infocartype,o.cartype,i.imgurl imgurl,info.price price,info.orderid,o.carmodel carmodel
+        from orderinfo info left join officialcar o on info.carid=o.carid left join imgs i on info.carid=i.objid
+        <where>
+            <if test="orderid!=null and orderid !=''">
+                and info.orderid=#{orderid}
+            </if>
+            <if test="type!=null and type!=''">
+                and info.type=#{type}
+            </if>
+
+            and info.status='1'
+        </where>
+
+    </select>
+    <select id="selectOrderinfoByCaridAndColor" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) number from orderinfo where orderid=#{orderid} and carid=#{carid} and carcolor=#{carcolor} and cartype=#{infocartype}
+    </select>
+    <select id="selectOrderinfoLate" resultMap="BaseResultMap">
+         select orderinfoid,addtime,orderid,cartype,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,margin,
+          realprice,cause,is_sign,updatetime,settlement,time from orderinfo
+          where status='0' and type='2' and is_sign='0'
+    </select>
+    <select id="selectOrderinfoSwitch" resultMap="BaseResultMap">
+        select orderinfoid,addtime,orderid,cartype,carid,carcolor,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,margin,
+          realprice,cause,is_sign,updatetime,settlement from orderinfo
+          where  type='2'
+    </select>
+    <select id="selectOrderinfoSettlement" resultMap="BaseResultMap">
+        select orderinfoid,addtime,orderid,cartype,carcolor,carid,price,userid,orderpaystatus,carmainpaystatus,status,liaisonname,liaisonphone,type,reviewstatus,margin,
+          realprice,cause,is_sign,updatetime,settlement from orderinfo
+          where type='3' and settlement='0'
+    </select>
+    <update id="updateOrderinfoByOrderid" parameterType="java.lang.String">
+        update orderinfo
+        set type='2'
+        where orderid=#{orderid}
+    </update>
+    <select id="selectOrderinfoByOrderidAndtypeAndCartype" parameterType="java.util.Map" resultType="java.util.Map">
+        select info.orderinfoid,info.orderid,info.cartype,info.carid,info.userid,info.orderpaystatus,info.carmainpaystatus,info.status,info.type,info.settlement,c.carcolor,c.carmodel,c.carnumber,c.type brandtype,
+        i.imgurl,(select count(*) from commentuser where orderid=info.orderinfoid) iscomment
+        from orderinfo info left join car c on info.carid=c.carid
+        left join imgs i on info.carid=i.objid
+        <where>
+            <if test="orderid!=null and orderid!=''">
+                and info.orderid=#{orderid}
+            </if>
+            <if test="cartype!=null and cartype!=''">
+                and info.cartype=#{cartype}
+            </if>
+            <if test="type!=null and type!=''">
+                <choose>
+                    <when test='type=="0"'>
+                        and (info.type='0' or info.type='1')
+                    </when>
+                    <otherwise>
+                        and info.type<![CDATA[>=]]>#{type}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="userid!=null and userid!=''">
+                and info.userid=#{userid}
+            </if>
+        </where>
+    </select>
+    <select id="reserveCarOrders" parameterType="java.util.Map" resultType="java.util.Map">
+        select info.orderinfoid,info.orderid,info.cartype infocartype,info.carid,info.userid,info.orderpaystatus,info.carmainpaystatus,info.status,info.type,info.settlement,info.carcolor,c.carmodel,c.carnumber,c.cartype,
+        i.imgurl,(select count(*) from commentuser where orderid=info.orderinfoid) iscomment
+        from orderinfo info left join officialcar c on info.carid=c.carid
+        left join imgs i on info.carid=i.objid
+        <where>
+        <if test="orderid!=null and orderid!=''">
+            and info.orderid=#{orderid}
+        </if>
+        <if test="cartype!=null and cartype!=''">
+            and info.cartype=#{cartype}
+        </if>
+        and info.status='1'
+        </where>
+    </select>
+    <select id="selectOrderinfoByResNumber" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from orderinfo
+        where orderid=#{orderid} and status='0' and orderpaystatus='1' and cartype=#{cartype}
+    </select>
+    <select id="selectInfoByOrderid" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select orderinfoid,orderid,cartype,carid,price,carmainpaystatus,status,liaisonname,liaisonphone,type
+        from orderinfo
+        where orderid=#{orderid} and status='1' and type='0'
+    </select>
+    <select id="payorderinfo" parameterType="com.wxtemplate.api.entity.Orderinfo" resultType="java.util.Map">
+          select u.name name,u.headurl,c.carmodel carmodel,c.carnumber carnumber,c.carcolor color,i.imgurl,l.licensestatus,info.cartype,info.orderpaystatus,info.carmainpaystatus,info.orderinfoid,c.type,
+        (select AVG(xing)
+        from commentuser
+        where userid=u.userid) xing
+         from user u left join orderinfo info on u.userid=info.userid
+         left join car c on c.carid=info.carid left join imgs i on i.objid=c.carid left join license l on u.userid=l.userid
+         <where>
+             info.userid=#{userid} and info.orderid=#{orderid}
+             <if test="orderpaystatus!=null and orderpaystatus!=''">
+                 and info.orderpaystatus=#{orderpaystatus}
+             </if>
+         </where>
+
+    </select>
+    <select id="selectUnfinished" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from orderinfo where orderid=#{orderid} and type='2' and status='0'
+    </select>
+    <delete id="deleteByOrderIdAndType" parameterType="java.lang.String" >
+        delete from orderinfo where orderid=#{orderid} and type&lt;2
+    </delete>
+    <select id="selectReceived" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from orders where orderid in(select distinct info.orderid from orderinfo info where info.status=#{status} and info.type=#{type} and info.userid=#{userid})
+    </select>
+    <select id="selectReservation" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from orders where orderid in(select distinct info.orderid from orderinfo info where info.status=#{status} and info.type=#{type}) and userid=#{userid}
+    </select>
+    <select id="selectOrderInfoByOrderIdAndCarId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from orderinfo where orderid=#{orderId} and carid=#{carId}
+    </select>
+</mapper>

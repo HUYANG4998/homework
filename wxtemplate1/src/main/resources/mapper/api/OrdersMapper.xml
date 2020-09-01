@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.OrdersMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Orders">
+        <id column="orderid" property="orderid" />
+        <result column="userid" property="userid" />
+        <result column="maincar" property="maincar" />
+        <result column="maincartype" property="maincartype" />
+        <result column="maincarcolor" property="maincarcolor" />
+        <result column="maincarprice" property="maincarprice" />
+        <result column="deputycartype" property="deputycartype" />
+        <result column="deputycarcolor" property="deputycarcolor" />
+        <result column="deputycarprice" property="deputycarprice" />
+        <result column="deputycarnum" property="deputycarnum" />
+        <result column="brideadress" property="brideadress" />
+        <result column="bridejwd" property="bridejwd" />
+        <result column="groomadress" property="groomadress" />
+        <result column="groomjwd" property="groomjwd" />
+        <result column="hoteladress" property="hoteladress" />
+        <result column="hoteljwd" property="hoteljwd" />
+        <result column="marrytime" property="marrytime" />
+        <result column="hour" property="hour" />
+        <result column="kilometre" property="kilometre" />
+        <result column="liaison" property="liaison" />
+        <result column="liaisonphone" property="liaisonphone" />
+        <result column="addtime" property="addtime" />
+        <result column="overtimeprice" property="overtimeprice" />
+        <result column="orderstatus" property="orderstatus" />
+        <result column="marrystage" property="marrystage" />
+        <result column="allprice" property="allprice" />
+        <result column="maincarid" property="maincarid" />
+        <result column="deputycarid" property="deputycarid" />
+        <result column="status" property="status" />
+        <result column="reason" property="reason" />
+        <result column="remark" property="remark" />
+        <result column="notice" property="notice" />
+        <result column="ordernumber" property="ordernumber" />
+        <result column="decs" property="decs" />
+        <result column="descr" property="descr" />
+        <result column="iscomment" property="iscomment" />
+
+
+
+    </resultMap>
+    <select id="selectNewOrderByUserId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select orderid,userid,maincar,maincartype,maincarcolor,maincarprice,deputycartype,deputycarcolor,deputycarprice,deputycarnum,brideadress,groomadress,
+        hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,addtime,overtimeprice,orderstatus,marrystage,allprice
+        from orders where userid=#{userid} order by addtime desc limit 0,1
+    </select>
+    <select id="selectMainOrderInfoByNum" parameterType="java.lang.String" resultType="java.util.Map">
+        select count(*) mainNum,(${num}-count(*)) mainRemain
+from orders o left join orderinfo info on o.orderid=info.orderid where o.orderid=#{orderid} and info.cartype='main' and info.orderpaystatus='1' and info.carmainpaystatus='1'
+    </select>
+    <select id="selectDeputyOrderInfoByNum" parameterType="java.lang.String" resultType="java.util.Map">
+        select count(*) deputyNum,((select deputycarnum
+from orders where orderid=#{orderid})-count(*)) deputyRemain
+from orders o left join orderinfo info on o.orderid=info.orderid where o.orderid=#{orderid} and info.cartype='deputy' and info.orderpaystatus='1' and info.carmainpaystatus='1'
+    </select>
+    <select id="selectOrderByUserIdAndOrderstatus" parameterType="java.lang.String" resultMap="BaseResultMap">
+         select orderid,userid,maincar,maincartype,maincarcolor,maincarprice,deputycartype,deputycarcolor,deputycarprice,deputycarnum,brideadress,groomadress,
+        hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,addtime,overtimeprice,orderstatus,marrystage,allprice,status,reason
+        from orders where userid=#{userid} and orderstatus=#{orderstatus} and (maincartype is not null or deputycartype is not null) order by marrytime desc
+    </select>
+    <select id="selectOrderByOrderInfo" resultType="java.util.Map" parameterType="java.util.Map">
+        select orderid,userid,brideadress,groomadress,iscomment,
+        hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,addtime,overtimeprice,orderstatus,marrystage,allprice,(select count(*) from commentuser where orderid=o.orderid),(select name from car_decoration where car_decoration_id=o.decs) de_name,(select price from car_decoration where car_decoration_id=o.decs) de_price
+        from orders o
+        where orderid in(select DISTINCT(orderid)
+        from orderinfo where status=1 and type=#{type}) and userid=#{userid} order by marrytime desc
+    </select>
+    <select id="selectOrdersByOrderId" parameterType="java.lang.String" resultType="java.util.Map">
+        select orderid,maincartype,maincarcolor,maincarprice,deputycartype,deputycarcolor,deputycarprice,deputycarnum,userid,brideadress,groomadress,ordernumber,
+        IFNULL(hoteladress, '') hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,addtime,overtimeprice,orderstatus,marrystage,allprice,status,notice,remark,(select name from car_decoration where car_decoration_id= o.decs) decs,IFNULL(descr, '') descr
+        from orders o where  orderid=#{orderid}
+    </select>
+    <select id="selectTakeMyOrderInfo" parameterType="java.util.Map" resultType="java.util.Map">
+         select orderid,userid,maincar,maincartype,maincarcolor,maincarprice,deputycartype,deputycarcolor,deputycarprice,deputycarnum,brideadress,groomadress,
+        hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,addtime,overtimeprice,orderstatus,marrystage,allprice,bridejwd,groomjwd,hoteljwd
+        from orders
+        where orderid in(select DISTINCT(orderid)
+        from orderinfo where status=0 and type=#{type} and userid=#{userid}) order by marrytime desc
+    </select>
+    <select id="selectOrderList" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select orderid,userid,maincar,maincarid,maincartype,maincarcolor,maincarprice,deputycarid,deputycartype,
+        deputycarcolor,deputycarprice,deputycarnum,brideadress,groomadress,hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,
+        addtime,overtimeprice,orderstatus,marrystage,allprice,status,reason
+        from orders
+        where orderstatus='0' and status='1' and userid != #{userid}
+        order by marrytime desc
+
+    </select>
+    <select id="selectAllOrder" resultType="java.util.Map">
+        select orderid,userid,maincar,maincarid,maincartype,maincarcolor,maincarprice,deputycarid,deputycartype,
+        deputycarcolor,deputycarprice,deputycarnum,brideadress,groomadress,hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,
+        addtime,overtimeprice,orderstatus,marrystage,allprice,status,reason
+        from orders
+        where orderstatus='0' and status is not null and status !='2'
+        order by status asc,addtime desc
+    </select>
+
+
+    <select id="selectOrdersByType" parameterType="java.lang.String" resultType="java.util.Map">
+        select orderid,maincartype,deputycartype,userid,brideadress,groomadress,hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,
+        addtime,overtimeprice,orderstatus,marrystage,allprice,status,reason,remark,ordernumber,notice,(select count(*) from commentuser c where c.orderid=o.orderid) count
+        from orders o
+        where orderid in(select DISTINCT(orderid)
+        from orderinfo where type=#{type})
+        <if test="ordernumber!=null and ordernumber !=''">
+            and liaisonphone like concat('%',#{ordernumber},'%')
+        </if>
+        order by marrytime desc
+    </select>
+    <select id="selectOrderComplete" resultType="java.util.Map" parameterType="java.lang.String">
+        select o.orderid,o.userid,o.brideadress,o.groomadress,o.hoteladress,DATE_FORMAT(o.marrytime,'%Y-%m-%d %H:%i:%s') marrytime,o.hour,o.kilometre,o.liaison,
+		o.liaisonphone,o.notice,o.ordernumber,o.maincartype,o.deputycartype,
+        o.addtime,o.overtimeprice,o.orderstatus,o.marrystage,o.allprice,o.status,o.reason,o.remark,(select count(*) from commentuser c where c.orderid=o.orderid) count
+        from orders o
+        <where>
+            <if test="orderstatus!=null and orderstatus !=''">
+                and o.orderstatus=#{orderstatus}
+            </if>
+            <if test="ordernumber!=null and ordernumber !=''">
+                and o.ordernumber=#{ordernumber}
+            </if>
+        </where>
+    </select>
+    <select id="selectByOrderNumber" parameterType="java.lang.String" resultType="java.lang.String">
+        select orderid from orders where ordernumber=#{ordernumber}
+    </select>
+    <select id="selectByOrderstatus" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from orders where orderstatus=#{orderstatus} and userid=#{userid} and status is not null
+    </select>
+    <select id="selectAfterMarry" resultMap="BaseResultMap">
+        select orderid,userid,maincar,maincartype,maincarcolor,maincarprice,deputycartype,deputycarcolor,deputycarprice,deputycarnum,brideadress,groomadress,
+        hoteladress,DATE_FORMAT(marrytime,'%Y-%m-%d %H:%i:%s') marrytime,hour,kilometre,liaison,liaisonphone,addtime,overtimeprice,orderstatus,marrystage,allprice
+        from orders where orderstatus='0' and status = '1'
+    </select>
+</mapper>

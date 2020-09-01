@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.CarMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Car">
+        <id column="carid" property="carid" />
+        <result column="cardesc" property="cardesc" />
+        <result column="carcolor" property="carcolor" />
+        <result column="carmodel" property="carmodel" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+        <result column="userid" property="userid" />
+        <result column="carnumber" property="carnumber" />
+        <result column="drivinglicense" property="drivinglicense" />
+        <result column="type" property="type" />
+        <result column="status" property="status" />
+        <result column="cause" property="cause" />
+        <result column="starttime" property="starttime" />
+        <result column="endtime" property="endtime" />
+    </resultMap>
+    <resultMap id="VoResultMap" type="com.wxtemplate.api.entity.VO.CarVo">
+        <id column="carid" property="carid" />
+        <result column="cardesc" property="cardesc" />
+        <result column="carcolor" property="carcolor" />
+        <result column="carmodel" property="carmodel" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+        <result column="userid" property="userid" />
+        <result column="carnumber" property="carnumber" />
+        <result column="drivinglicense" property="drivinglicense" />
+        <result column="type" property="type" />
+        <result column="imageurls" property="imageurls" />
+        <result column="status" property="status" />
+        <result column="cause" property="cause" />
+    </resultMap>
+    <delete id="deleteCarById" parameterType="java.lang.String">
+        delete from car
+		where carid=#{carid}
+    </delete>
+    <select id="selectMyCarByUserId" parameterType="java.util.Map" resultType="java.util.Map">
+        select c.carid,c.cardesc,c.carcolor,c.carmodel,c.addtime,c.updatetime,c.carnumber,c.drivinglicense,c.type,img.imgurl imageurls,c.userid
+        from car c left join imgs img on c.carid=img.objid
+        <where>
+            <if test="userid!=null and userid!=''">
+                and c.userid=#{userid}
+            </if>
+            <if test="starttime!=null and endtime!=null">
+                and c.starttime not between #{starttime} and #{endtime} and c.endtime not between #{starttime} and #{endtime}
+            </if>
+            and status='1'
+        </where>
+    </select>
+    <select id="selectCarByUserIdAndOrderId" parameterType="java.lang.String" resultType="java.util.Map">
+        select u.name name,u.headurl,c.carmodel carmodel,c.carnumber carnumber,c.carcolor color,i.imgurl,l.licensestatus,
+        (select AVG(xing)
+        from commentuser
+        where userid=u.userid) xing
+         from user u left join orderinfo info on u.userid=info.userid
+         left join car c on c.carid=info.carid left join imgs i on i.objid=c.carid left join license l on u.userid=l.userid
+         where info.userid=#{userid} and info.orderid=#{orderid} and info.type=#{type}
+    </select>
+    <select id="selectCarByOrderId" parameterType="java.util.Map" resultType="java.util.Map">
+        select distinct(info.userid) userid, u.name name,u.headurl,info.liaisonphone,info.liaisonname,l.licensestatus,(select AVG(xing)
+        from commentuser
+        where userid=u.userid) xing,(select count(*) from license where userid=info.userid and licensestatus='1') license
+         from orderinfo info left join user u on info.userid=u.userid
+         left join license l on u.userid=l.userid
+         <where>
+             <if test="orderid!=null and orderid !=''">
+                and  info.orderid=#{orderid}
+             </if>
+             <if test="cartype!=null and cartype!=''">
+                and info.cartype=#{cartype}
+             </if>
+             <if test="type!=null and type!=''">
+                  <choose>
+                      <when test='type=="0"'>
+                          and (info.type='0' or info.type='1')
+                      </when>
+                      <otherwise>
+                          and info.type<![CDATA[>=]]>#{type}
+                      </otherwise>
+                  </choose>
+             </if>
+
+             and info.status='0'
+         </where>
+
+    </select>
+    <select id="selectAllMyCar" resultType="java.util.Map" parameterType="java.lang.String">
+        select c.carid,c.cardesc,c.carcolor,c.carmodel,c.addtime,c.updatetime,c.userid,c.carnumber,c.drivinglicense,c.type,
+        status,i.imgurl imgurl
+        from car c left join imgs i on c.carid=i.objid
+        <where>
+            <if test="carnumber!=null and carnumber!=''">
+                carnumber like concat('%',#{carnumber},'%')
+            </if>
+        </where>
+        order by status asc,addtime desc
+    </select>
+    <select id="selectMyCarByCarid" parameterType="java.lang.String" resultType="java.util.Map">
+        select c.carid,c.cardesc,c.carcolor,c.carmodel,c.addtime,c.updatetime,c.userid,c.carnumber,c.drivinglicense,c.type,c.status,c.cause,
+        i.imgurl imgurl
+        from car c left join imgs i on c.carid=i.objid
+        where c.carid=#{carid}
+    </select>
+    <select id="selectCarByNotMarrayTime" parameterType="java.util.Map" resultType="java.util.Map">
+        select c.carcolor,c.carnumber,c.type,c.carmodel,i.imgurl
+        from car c left join imgs i on c.carid=i.objid
+        where c.userid=#{userid}
+    </select>
+</mapper>

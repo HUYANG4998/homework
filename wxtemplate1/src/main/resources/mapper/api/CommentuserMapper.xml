@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.CommentuserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Commentuser">
+        <id column="commentid" property="commentid" />
+        <result column="content" property="content" />
+        <result column="userid" property="userid" />
+        <result column="commuserid" property="commuserid" />
+        <result column="xing" property="xing" />
+        <result column="addtime" property="addtime" />
+        <result column="orderid" property="orderid" />
+    </resultMap>
+
+    <select id="selectMyEval" parameterType="java.lang.String" resultType="java.util.Map">
+        select u.name,u.headurl,c.xing,c.content
+        from commentuser c left join user u on c.commuserid=u.userid
+				where c.userid=#{userid}
+    </select>
+    <select id="selectCommentUserByOrderid" parameterType="java.lang.String" resultType="java.util.Map">
+        select c.content,c.xing,u.name
+        from commentuser c left join user u on c.commuserid=u.userid
+        where c.orderid=#{orderid}
+    </select>
+    <select id="selectCommentUser" resultType="java.util.Map">
+        select commentid,content,xing,DATE_FORMAT(addtime,'%Y-%m-%d %H:%i:%s') addtime
+        from commentuser order by addtime desc
+    </select>
+    <select id="selectCommentUserByCommentid" parameterType="java.lang.String" resultType="java.util.Map">
+        select c.commentid,c.content,c.xing,DATE_FORMAT(c.addtime,'%Y-%m-%d %H:%i:%s') addtime,(select name from user where userid=c.userid) passivity,(select name from user where userid=c.commuserid) initiative
+        from commentuser c
+        where c.commentid=#{commentid}
+    </select>
+    <select id="selectofficialcarComment" resultType="java.util.Map">
+        select c.commentid,c.content,c.xing,c.addtime,IFNULL(u.headurl,'') headurl,u.name from
+        commentuser c left join user u on c.commuserid=u.userid where c.userid is null or c.userid=''
+    </select>
+</mapper>

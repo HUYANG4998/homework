@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.User">
+        <result column="userid" property="userid" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="phone" property="phone" />
+        <result column="headurl" property="headurl" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+        <result column="realname" property="realname" />
+        <result column="license" property="license" />
+        <result column="price" property="price" />
+        <result column="cid" property="cid" />
+        <result column="version" property="version" />
+        <result column="isuser" property="isuser" />
+    </resultMap>
+    <select id="selectUserByPhone" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select userid,name,password,phone,headurl,addtime,updatetime,realname,license,price,isuser from user where phone=#{phone}
+    </select>
+    <update id="updatePasswordByPhone" parameterType="com.wxtemplate.api.entity.User">
+        update user
+        <set>
+            <if test="password != null and password !=''">password = #{password},</if>
+            <if test="updatetime != null and updatetime !=''">updatetime = #{updatetime},</if>
+        </set>
+        where phone=#{phone}
+    </update>
+    <select id="selectUser" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select userid,name,password,phone,headurl,addtime,updatetime,realname,license,price
+        from user
+        where userid=#{userid}
+    </select>
+    <select id="selectUserList" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select userid,name,phone,addtime,price,case isuser
+        when '0' then '禁用'
+        when '1' then '启用'
+        end isuser from user
+        <where>
+            <if test="phone!=null and phone!=''">
+                phone like concat('%',#{phone},'%')
+            </if>
+        </where>
+        order by addtime desc
+    </select>
+    <select id="selectUserAll" resultMap="BaseResultMap">
+        select userid,name,phone,addtime,price from user
+        where realname='1'
+    </select>
+</mapper>

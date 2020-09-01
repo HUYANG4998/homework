@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.EnduserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Enduser">
+        <id column="enduserid" property="enduserid" />
+        <result column="endusername" property="endusername" />
+        <result column="endphone" property="endphone" />
+        <result column="endpassword" property="endpassword" />
+        <result column="endimage" property="endimage" />
+        <result column="permission" property="permission" />
+    </resultMap>
+
+    <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select enduserid,endusername,endphone,endpassword,endimage
+        from enduser where endusername=#{name}
+    </select>
+    <select id="selectRandomOne" resultType="java.lang.String">
+        select enduserid from enduser where permission='0' ORDER BY RAND() LIMIT 1
+    </select>
+    <select id="selectByPhone" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select enduserid,endusername,endphone,endpassword,endimage,permission
+        from enduser where endphone=#{phone}
+    </select>
+    <select id="selectEndUser" resultMap="BaseResultMap">
+      select enduserid,endusername,endphone,endpassword,endimage,
+      case permission
+        when 0 then '普通员工'
+        when 1 then '管理员'
+        end permission
+      from enduser
+      where enduserid not in(#{userid}) order by permission desc
+    </select>
+</mapper>

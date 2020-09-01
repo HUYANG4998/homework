@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.PromotebasicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Promotebasic">
+        <id column="promotebasicid" property="promotebasicid" />
+        <result column="introduction" property="introduction" />
+        <result column="companyphone" property="companyphone" />
+        <result column="companyaddress" property="companyaddress" />
+        <result column="appaddress" property="appaddress" />
+        <result column="weixin" property="weixin" />
+        <result column="introduce" property="introduce" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+    </resultMap>
+    <select id="selectBasic" resultMap="BaseResultMap">
+        select promotebasicid,introduction,companyphone,companyaddress,appaddress,weixin,introduce,title,content from promotebasic limit 0,1
+    </select>
+</mapper>

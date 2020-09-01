@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.ViolationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Violation">
+        <id column="violationid" property="violationid" />
+        <result column="content" property="content" />
+        <result column="releaseprocess" property="releaseprocess" />
+        <result column="ordering" property="ordering" />
+        <result column="orderprocess" property="orderprocess" />
+        <result column="takeorder" property="takeorder" />
+        <result column="costdescription" property="costdescription" />
+        <result column="tripdescription" property="tripdescription" />
+        <result column="agreement" property="agreement" />
+        <result column="servicephone" property="servicephone" />
+        <result column="coupleprocess" property="coupleprocess" />
+        <result column="payway" property="payway" />
+        <result column="companyin" property="companyin" />
+        <result column="vipagree" property="vipagree" />
+        <result column="privacyagree" property="privacyagree" />
+        <result column="copyright" property="copyright" />
+        <result column="useragreement" property="useragreement" />
+        <result column="privacypolicy" property="privacypolicy" />
+
+    </resultMap>
+    <select id="selectViolation" resultMap="BaseResultMap">
+        select violationid,content,releaseprocess,ordering,orderprocess,takeorder,costdescription,
+        tripdescription,agreement,servicephone,payway,coupleprocess,companyin,useragreement,privacypolicy,
+         vipagree,privacyagree,copyright from violation limit 0,1
+    </select>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.EarnMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Earn">
+        <id column="earndetailid" property="earndetailid" />
+        <result column="content" property="content" />
+        <result column="price" property="price" />
+        <result column="userid" property="userid" />
+        <result column="earn" property="earn" />
+        <result column="addtime" property="addtime" />
+    </resultMap>
+    <select id="selectEarnByAddtime" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select earndetailid,content,price,earn,DATE_FORMAT(addtime,'%Y-%m-%d %H:%i:%s') addtime
+        from earn
+        <where>
+            <if test="addtime!=null and addtime !=''">
+                addtime like '%${addtime}%'
+            </if>
+            <if test="userid!=null and userid!=''">
+                and userid=#{userid}
+            </if>
+        </where>
+        order by addtime desc
+    </select>
+    <select id="yesterdayEarnAndprice" parameterType="java.lang.String" resultType="java.lang.String">
+        select sum(price) yesterdayEarn
+        from earn
+		where addtime like '%${day}%' and earn='0' and userid=#{userid}
+
+    </select>
+</mapper>

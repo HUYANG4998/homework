@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.api.mapper.GaragMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.api.entity.Garag">
+        <id column="garageid" property="garageid" />
+        <result column="userid" property="userid" />
+        <result column="carid" property="carid" />
+        <result column="carcolor" property="carcolor" />
+        <result column="addtime" property="addtime" />
+        <result column="purpose" property="purpose" />
+        <result column="touchname" property="touchname" />
+        <result column="touchephone" property="touchephone" />
+        <result column="carnum" property="carnum" />
+        <result column="packageid" property="packageid" />
+        <association property="officialcar" javaType="com.wxtemplate.api.entity.Officialcar">
+            <id property="carid" column="o_carid" />
+            <result property="cardesc" column="cardesc"/>
+            <result property="carcolor" column="o_carcolor"/>
+            <result property="carmodel" column="carmodel"/>
+            <result property="addtime" column="addtime"/>
+            <result property="updatetime" column="updatetime"/>
+            <result property="userid" column="userid"/>
+            <result property="carnumber" column="carnumber"/>
+            <result property="brandid" column="brandid"/>
+            <result property="cartype" column="cartype"/>
+            <result property="sumnum" column="sumnum"/>
+            <result property="carprice" column="carprice"/>
+            <result property="sales" column="sales"/>
+            <result property="seat" column="seat"/>
+            <result property="type" column="type"/>
+            <result property="status" column="status"/>
+            <result property="overtimeprice" column="overtimeprice"/>
+            <association property="imgs" javaType="com.wxtemplate.api.entity.Imgs">
+                <id property="imgsid" column="imgsid" />
+                <result property="imgurl" column="imgurl"/>
+                <result property="addtime" column="addtime"/>
+                <result property="objid" column="objid"/>
+            </association>
+        </association>
+
+    </resultMap>
+    <select id="selectByUserId" parameterType="java.lang.String" resultType="java.util.Map">
+           select g.carcolor,o.carprice,o.carmodel,o.cartype,ifnull(i.imgurl,'') imgurl,g.garageid,g.carnum,p.main_color,p.deputy_color,p.deputy_number,p.price,ifnull(g.carid,'') carid,
+          (select concat(cartype,carmodel) from officialcar where carid=p.main_id) maintype,ifnull(g.packageid,'') packageid,
+          (select concat(cartype,carmodel) from officialcar where carid=p.deputy_id) deputytype
+            from garag g left join
+            officialcar o on g.carid=o.carid
+            left join imgs i on g.carid=i.objid
+            left join package p on g.packageid=p.packageid
+						where g.userid=#{userid}
+    </select>
+</mapper>
