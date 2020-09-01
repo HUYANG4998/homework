@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.FriendCircleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.FriendCircle">
+        <id column="friend_circle_id" property="friendCircleId" />
+        <result column="user_id" property="userId" />
+        <result column="content" property="content" />
+        <result column="images" property="images" />
+        <result column="addtime" property="addtime" />
+    </resultMap>
+    <select id="selectFriendCircleById" parameterType="java.lang.String" resultType="java.util.Map">
+        select f.friend_circle_id,f.user_id,f.content,IFNULL(f.images,'') images,f.addtime,u.nickname,u.head_image
+        from friend_circle f left join user u on f.user_id=u.user_id
+        where f.friend_circle_id=#{friendCircleId}
+    </select>
+    <select id="selectFriendCircle" parameterType="java.util.List" resultType="java.util.Map">
+        select f.friend_circle_id,f.user_id,f.content,IFNULL(f.images,'') images,f.addtime,u.nickname,u.head_image
+        from friend_circle f left join user u on f.user_id=u.user_id
+        where f.user_id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

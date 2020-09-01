@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.AdvertisingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.Advertising">
+        <id column="advertising_id" property="advertisingId" />
+        <result column="user_id" property="userId" />
+        <result column="type" property="type" />
+        <result column="status" property="status" />
+        <result column="image" property="image" />
+        <result column="location" property="location" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="addtime" property="addtime" />
+        <result column="is_validity" property="isValidity" />
+        <result column="number_days" property="numberDays" />
+    </resultMap>
+    <select id="selectAllAdvertising" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select advertising_id,user_id,
+      case type
+      when '1' then '主页'
+      when '2' then '红包'
+      when '3' then '朋友圈'
+      else '我的'
+      end type,
+      case status
+      when '0' then '系统'
+      else '用户'
+      end status,image,location,start_time,end_time,addtime,
+      case is_validity
+      when '0' then '无效'
+      else '有效'
+      end is_validity,number_days
+      from advertising
+      <where>
+          <if test="type!=null and type!=''">
+              type like concat('%',#{type},'%')
+          </if>
+      </where>
+    </select>
+    <select id="selectAdvertisingFive" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select advertising_id,user_id,type,status,image,location,start_time,end_time,addtime,is_validity
+        from advertising where type=#{type} and is_validity='1' order by status desc,addtime asc limit 0,5
+    </select>
+    <select id="selectAdvertingByUserId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select advertising_id,user_id,type,status,image,location,DATE_FORMAT(start_time,'%Y-%m-%d') start_time,DATE_FORMAT(end_time,'%Y-%m-%d') end_time,addtime,is_validity
+        from advertising where user_id=#{userId} order by addtime desc
+    </select>
+    <select id="selectAdvertingRandom" resultType="java.util.Map">
+        select advertising_id,user_id,type,status,image,location,start_time,end_time,addtime,is_validity
+        from advertising where type = '3' and is_validity = '1' order by rand( ) limit 0,1
+    </select>
+</mapper>

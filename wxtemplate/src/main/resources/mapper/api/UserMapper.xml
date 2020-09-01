@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.User">
+        <id column="user_id" property="userId" />
+        <result column="last_user_id" property="lastUserId" />
+        <result column="ser_number" property="serNumber" />
+        <result column="phone" property="phone" />
+        <result column="password" property="password" />
+        <result column="head_image" property="headImage" />
+        <result column="nickname" property="nickname" />
+        <result column="wechat" property="wechat" />
+        <result column="qq" property="qq" />
+        <result column="email" property="email" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+        <result column="money" property="money" />
+        <result column="release_number" property="releaseNumber" />
+        <result column="refresh_number" property="refreshNumber" />
+        <result column="vip" property="vip" />
+        <result column="address" property="address" />
+        <result column="vip_expiration_time" property="vipExpirationTime" />
+        <result column="advertising_number" property="advertisingNumber" />
+        <result column="permission" property="permission" />
+        <result column="qr_code" property="qrCode" />
+        <result column="gender" property="gender" />
+        <result column="birth" property="birth" />
+        <result column="nation" property="nation" />
+        <result column="age" property="age" />
+        <result column="contact" property="contact" />
+        <result column="location" property="location" />
+    </resultMap>
+    <select id="selectUser" resultMap="BaseResultMap">
+        select user_id,ser_number,phone,head_image,nickname,addtime,updatetime,release_number,refresh_number,vip,vip_expiration_time,advertising_number,qr_code,
+        gender,birth,nation,age,contact,location
+        from user
+    </select>
+    <select id="selectBySerNumber" parameterType="java.lang.String" resultType="java.util.Map">
+        select user_id,last_user_id,ser_number,phone,password,head_image,nickname,wechat,qq,email,addtime,updatetime,money,release_number,refresh_number,
+        vip,address,vip_expiration_time,advertising_number,permission,gender,birth,nation,age,contact,location
+        from user where ser_number=#{id}
+    </select>
+    <select id="selectbyPhone" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select user_id,phone,password
+        from user
+       where  phone=#{phone}
+    </select>
+    <select id="selectAllUser" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select user_id,last_user_id,ser_number,phone,password,head_image,nickname,wechat,qq,email,addtime,updatetime,money,release_number,refresh_number,
+        address,vip_expiration_time,advertising_number,gender,birth,nation,age,contact,location,
+        case permission
+        when '0' then '永久封号'
+        when '1' then '启用'
+        else '禁用'
+        end permission,
+        case vip
+        when '0' then '普通会员'
+        else '尊贵会员'
+        end vip from user
+        <where>
+            <if test="phone!=null and phone!=''">
+                phone like concat('%',#{phone},'%')
+            </if>
+            <if test="lastUserId!=null and lastUserId!=''">
+                and last_user_id=#{lastUserId}
+            </if>
+        </where>
+    </select>
+    <select id="selectLikeAddTime" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from user
+        <where>
+            <if test="addtime!=null and addtime!=''">
+                and addtime like concat('%',#{addtime},'%')
+            </if>
+            <if test="vip!=null and vip!=''">
+                and vip=#{vip}
+            </if>
+        </where>
+    </select>
+    <select id="selectSubordinate" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select user_id,nickname,head_image,gender,birth,nation,age,contact,location
+        from user where last_user_id=#{userId}
+    </select>
+
+
+</mapper>

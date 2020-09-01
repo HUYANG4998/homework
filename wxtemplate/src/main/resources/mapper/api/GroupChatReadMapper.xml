@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.GroupChatReadMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.GroupChatRead">
+        <id column="group_chat_read_id" property="groupChatReadId" />
+        <result column="user_id" property="userId" />
+        <result column="group_chat_id" property="groupChatId" />
+        <result column="is_read" property="isRead" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+    </resultMap>
+    <select id="selectByUserIdAndGroupChatId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select group_chat_read_id,group_chat_read_id,user_id,group_chat_id,is_read from group_chat_read
+        where user_id=#{userId} and group_chat_id=#{toId} order by addtime desc limit 0,1
+    </select>
+    <delete id="deleteByGroupChatId" parameterType="java.lang.String">
+        delete from group_chat_read where group_chat_id=#{groupChatId}
+    </delete>
+    <update id="updateByUserIdAndGroupChatId" parameterType="com.wxtemplate.wxtemplate.api.entity.GroupChatRead">
+        update group_chat_read
+        set
+        is_read = '1'
+        where user_id = #{userId} and group_chat_id =#{groupChatId}
+    </update>
+</mapper>

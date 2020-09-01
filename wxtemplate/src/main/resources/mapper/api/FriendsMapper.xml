@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.FriendsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.Friends">
+        <id column="friends_id" property="friendsId" />
+        <result column="from_user_id" property="fromUserId" />
+        <result column="to_user_id" property="toUserId" />
+        <result column="addtime" property="addtime" />
+        <result column="from_nick_name" property="fromNickName" />
+        <result column="to_nick_name" property="toNickName" />
+    </resultMap>
+    <select id="selectFriendsByUserIdAndFriendsId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from friends where (from_user_id=#{userId} and to_user_id=#{friendsId}) or (from_user_id=#{friendsId} and to_user_id=#{userId})
+    </select>
+    <select id="selectFriends" parameterType="java.lang.String" resultType="java.util.Map">
+        select friends_id,from_user_id,to_user_id,DATE_FORMAT(addtime,'%Y-%m-%d') addtime from friends
+        where (from_user_id=#{userId} or to_user_id=#{userId})
+        <if test="nickName !=null and nickName !=''">
+            AND ( from_nick_name like concat('%',#{nickName},'%') OR to_nick_name like concat('%',#{nickName},'%'))
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.GroupNoticeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.GroupNotice">
+        <id column="group_notice_id" property="groupNoticeId" />
+        <result column="group_chat_id" property="groupChatId" />
+        <result column="content" property="content" />
+        <result column="images" property="images" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+    </resultMap>
+
+</mapper>

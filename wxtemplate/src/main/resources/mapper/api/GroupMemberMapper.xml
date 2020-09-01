@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.GroupMemberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.GroupMember">
+        <id column="group_member_id" property="groupMemberId" />
+        <result column="group_chat_id" property="groupChatId" />
+        <result column="user_id" property="userId" />
+        <result column="permission" property="permission" />
+        <result column="banned" property="banned" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+    </resultMap>
+    <select id="selectGroupMemberByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+        select group_chat_id from group_member where user_id=#{userId}
+    </select>
+    <delete id="deleteByGroupChatId" parameterType="java.lang.String">
+        delete from group_member where group_chat_id=#{groupChatId}
+    </delete>
+    <select id="selectGroupMemberByGroupChatId" parameterType="java.lang.String" resultType="java.util.Map">
+        select u.nickname,u.user_id,u.head_image,g.group_member_id,g.group_chat_id
+        from group_member g left join user u on g.user_id=u.user_id
+        where g.group_chat_id=#{groupChatId}
+         <if test="permission!=null and permission!=''">and g.permission=#{permission}</if>
+         order by g.permission asc,u.addtime asc
+    </select>
+    <select id="selectChatByUserIdAndGroupId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from group_member
+        where user_id=#{userId} and group_chat_id=#{groupId}
+    </select>
+</mapper>

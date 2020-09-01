@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.ChatRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.ChatRecord">
+        <id column="chat_record_id" property="chatRecordId" />
+        <result column="from_user_id" property="fromUserId" />
+        <result column="to_id" property="toId" />
+        <result column="status" property="status" />
+        <result column="type" property="type" />
+        <result column="redMoney" property="red_money" />
+        <result column="redNumber" property="red_number" />
+        <result column="addtime" property="addtime" />
+        <result column="is_read" property="isRead" />
+        <result column="del_flag" property="delFlag" />
+        <result column="content" property="content" />
+        <result column="body" property="body" />
+    </resultMap>
+    <select id="selectPeopleMessageByUserId" parameterType="java.lang.String" resultType="java.util.Map">
+        select chat_record_id,from_user_id,to_id,status,type,DATE_FORMAT(addtime,'%Y-%m-%d %H:%i:%s') addtime,is_read,del_flag,content
+        from chat_record where (from_user_id=#{userId} or to_id=#{userId}) and status='1'
+    </select>
+    <select id="selectChatByUserIdAndGroupId" resultType="java.util.Map" parameterType="java.lang.String">
+        select c.chat_record_id,c.from_user_id,c.to_id,c.status,c.type,DATE_FORMAT(c.addtime,'%Y-%m-%d %H:%i:%s') addtime,c.is_read,c.del_flag,(select count(*) from group_chat_read where group_chat_id=#{groupId} and user_id=#{userId} and is_read ='0') number,
+        g.group_chat_id,g.group_head_image,g.group_name,c.content,u.nickname
+        from chat_record c left join user u on c.from_user_id=u.user_id
+         left join group_chat g on c.to_id=g.group_chat_id
+         where c.to_id=#{groupId} order by c.addtime desc limit 0,1
+    </select>
+    <select id="selectChatByUserIdAndFriendsUserId" parameterType="java.lang.String" resultType="java.util.Map">
+        select c.chat_record_id,c.from_user_id,c.to_id,c.status,c.type,DATE_FORMAT(c.addtime,'%Y-%m-%d %H:%i:%s') addtime,c.is_read,c.del_flag,u.head_image,u.nickname,u.vip,c.content
+        from chat_record c left join user u on c.from_user_id=u.user_id
+        where (c.from_user_id=#{userId} and c.to_id=#{friendsUserId}) or (c.from_user_id=#{friendsUserId} and c.to_id=#{userId}) order by c.addtime desc limit 0,1
+    </select>
+    <select id="selectByFormAndGotoCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*)
+        from chat_record where ((from_user_id=#{userId} and  to_id=#{friendsUserId}) or (to_id=#{userId} and from_user_id=#{friendsUserId})) and is_read='0'
+    </select>
+    <select id="selectMessageNumber" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*)
+        from chat_record where (from_user_id=#{userId} or to_id=#{userId}) and is_read='0'
+    </select>
+    <select id="selectGroupChatContent" parameterType="java.lang.String" resultType="java.util.Map">
+        select c.chat_record_id,c.from_user_id,c.to_id,c.status,c.type,DATE_FORMAT(c.addtime,'%Y-%m-%d %H:%i:%s') addtime,c.is_read,c.del_flag,u.head_image,u.nickname,u.vip,c.content,
+        c.red_money,c.red_number,c.body
+        from chat_record c left join user u on c.from_user_id=u.user_id
+        where c.to_id=#{groupId} order by c.addtime asc
+    </select>
+    <select id="selectFriendsChatContent" parameterType="java.lang.String" resultType="java.util.Map">
+        select c.chat_record_id,c.from_user_id,c.to_id,c.status,c.type,DATE_FORMAT(c.addtime,'%Y-%m-%d %H:%i:%s') addtime,c.is_read,c.del_flag,u.head_image,u.nickname,u.vip,c.content,
+        c.red_money,c.red_number,c.body
+        from chat_record c left join user u on c.from_user_id=u.user_id
+        where (c.from_user_id=#{fromUserId} and c.to_id=#{toId}) or (c.from_user_id=#{toId} and c.to_id=#{fromUserId}) order by c.addtime asc
+    </select>
+    <delete id="deleteByGroupChatId" parameterType="java.lang.String">
+        delete from chat_record where to_id=#{groupChatId}
+    </delete>
+    <select id="selectChatRecordByUserIdAndFirendsUserIdIsRead" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select chat_record_id,from_user_id,to_id,status,type,DATE_FORMAT(addtime,'%Y-%m-%d %H:%i:%s') addtime,is_read,del_flag,content
+        from chat_record where ((from_user_id=#{userId} and to_id=#{friendsUserId}) or (from_user_id=#{friendsUserId} and to_id=#{userId})) and is_read='0'
+    </select>
+</mapper>

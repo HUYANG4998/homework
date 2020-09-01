@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.FriendsInviteMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.FriendsInvite">
+        <id column="friends_invite_id" property="friendsInviteId" />
+        <result column="from_user_id" property="fromUserId" />
+        <result column="to_user_id" property="toUserId" />
+        <result column="group_chat_id" property="groupChatId" />
+        <result column="audit" property="audit" />
+        <result column="type" property="type" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+    </resultMap>
+    <select id="selectFriendsInvite" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select friends_invite_id,from_user_id,to_user_id,group_chat_id,audit,type,addtime,updatetime
+        from friends_invite where to_user_id=#{userId}
+        <if test="list != null and list.size != 0">
+            or (group_chat_id in
+            <foreach item="item" collection="list" separator="," open="(" close=")" index="">
+                #{item}
+            </foreach>
+            and to_user_id is null)
+        </if>
+
+         order by addtime desc
+    </select>
+</mapper>

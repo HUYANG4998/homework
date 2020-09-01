@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.DynamicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.Dynamic">
+        <id column="dynamic_id" property="dynamicId"/>
+        <result column="user_id" property="userId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="content" property="content"/>
+        <result column="images" property="images"/>
+        <result column="video" property="video"/>
+        <result column="red_package_money" property="redPackageMoney"/>
+        <result column="red_package_number" property="redPackageNumber"/>
+        <result column="hot_time" property="hotTime"/>
+        <result column="stick_time" property="stickTime"/>
+        <result column="visit_number" property="visitNumber"/>
+        <result column="give_like_number" property="giveLikeNumber"/>
+        <result column="collect_number" property="collectNumber"/>
+        <result column="addtime" property="addtime"/>
+        <result column="updatetime" property="updatetime"/>
+        <result column="stick" property="stick"/>
+        <result column="refresh_time" property="refreshTime"/>
+        <result column="hot_day" property="hotDay"/>
+        <result column="stick_day" property="stickDay"/>
+        <result column="comment_people" property="commentPeople"/>
+        <result column="head_video" property="headVideo"/>
+    </resultMap>
+
+    <select id="selectDynamicByCategoryId" parameterType="java.lang.String" resultType="java.util.Map">
+        select d.dynamic_id dynamicId,d.user_id userId,d.category_id categoryId,d.content,d.images,d.video,d.red_package_money redPackageMoney,d.red_package_number redPackageNumber,
+        DATE_FORMAT(d.hot_time,'%Y-%m-%d %H:%i:%s') hotTime,DATE_FORMAT(d.stick_time,'%Y-%m-%d %H:%i:%s') stickTime,d.visit_number visitNumber,d.give_like_number giveLikeNumber,
+        d.collect_number collectNumber,DATE_FORMAT(d.addtime,'%Y-%m-%d %H:%i:%s') addtime,DATE_FORMAT(d.updatetime,'%Y-%m-%d %H:%i:%s') updatetime,
+        d.stick,DATE_FORMAT(d.refresh_time,'%Y-%m-%d %H:%i:%s') refreshTime,u.head_image headImage,u.nickname,u.vip,d.head_video
+        from dynamic d left join user u on d.user_id=u.user_id where d.category_id=#{categoryId} order by d.stick asc,d.refresh_time desc
+    </select>
+
+    <select id="selectDynamicByUserId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select dynamic_id,user_id,category_id,content,images,video,red_package_money,red_package_number,head_video,
+        hot_time,stick_time,visit_number,give_like_number,collect_number,addtime,updatetime,stick,refresh_time
+        from dynamic where user_id=#{userId} order by addtime desc
+    </select>
+    <select id="selectDynamic" resultMap="BaseResultMap">
+        select dynamic_id,user_id,category_id,content,images,video,red_package_money,red_package_number,hot_time,stick_time,
+        visit_number,give_like_number,collect_number,addtime,updatetime,stick,refresh_time,hot_day,stick_day,comment_people,head_video
+        from dynamic
+    </select>
+    <delete id="deleteAllDynamic">
+        delete from dynamic
+    </delete>
+    <select id="selectRedPackageDynamic" resultType="java.util.Map">
+        select d.dynamic_id dynamicId,d.user_id userId,d.category_id categoryId,d.content,d.images,d.video,d.red_package_money redPackageMoney,d.red_package_number redPackageNumber,
+        DATE_FORMAT(d.hot_time,'%Y-%m-%d %H:%i:%s') hotTime,DATE_FORMAT(d.stick_time,'%Y-%m-%d %H:%i:%s') stickTime,d.visit_number visitNumber,d.give_like_number giveLikeNumber,
+        d.collect_number collectNumber,DATE_FORMAT(d.addtime,'%Y-%m-%d %H:%i:%s') addtime,DATE_FORMAT(d.updatetime,'%Y-%m-%d %H:%i:%s') updatetime,
+        d.stick,DATE_FORMAT(d.refresh_time,'%Y-%m-%d %H:%i:%s') refreshTime,u.head_image headImage,u.nickname,u.vip,d.head_video
+        from dynamic d left join user u on d.user_id=u.user_id
+        where red_package_number>0 order by red_package_money desc
+    </select>
+
+    <select id="selectDynamicByFriends" parameterType="java.lang.String" resultType="java.util.Map">
+        select d.dynamic_id dynamicId,d.user_id userId,d.category_id
+        categoryId,d.content,d.images,d.video,d.red_package_money redPackageMoney,d.red_package_number redPackageNumber,
+        DATE_FORMAT(d.hot_time,'%Y-%m-%d %H:%i:%s') hotTime,DATE_FORMAT(d.stick_time,'%Y-%m-%d %H:%i:%s')
+        stickTime,d.visit_number visitNumber,d.give_like_number giveLikeNumber,
+        d.collect_number collectNumber,DATE_FORMAT(d.addtime,'%Y-%m-%d %H:%i:%s')
+        addtime,DATE_FORMAT(d.updatetime,'%Y-%m-%d %H:%i:%s') updatetime,
+        d.stick,DATE_FORMAT(d.refresh_time,'%Y-%m-%d %H:%i:%s') refreshTime,u.head_image
+        headImage,u.nickname,u.vip,d.head_video
+        from dynamic d left join user u on d.user_id=u.user_id
+        <where>
+            d.user_id in
+            <foreach collection="friends" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+    <select id="selectDynamicByContent" parameterType="java.lang.String" resultType="java.util.Map">
+        select d.dynamic_id dynamicId,d.user_id userId,d.category_id
+        categoryId,d.content,d.images,d.video,d.red_package_money redPackageMoney,d.red_package_number redPackageNumber,
+        DATE_FORMAT(d.hot_time,'%Y-%m-%d %H:%i:%s') hotTime,DATE_FORMAT(d.stick_time,'%Y-%m-%d %H:%i:%s')
+        stickTime,d.visit_number visitNumber,d.give_like_number giveLikeNumber,
+        d.collect_number collectNumber,DATE_FORMAT(d.addtime,'%Y-%m-%d %H:%i:%s')
+        addtime,DATE_FORMAT(d.updatetime,'%Y-%m-%d %H:%i:%s') updatetime,
+        d.stick,DATE_FORMAT(d.refresh_time,'%Y-%m-%d %H:%i:%s') refreshTime,u.head_image
+        headImage,u.nickname,u.vip,d.head_video
+        from dynamic d left join user u on d.user_id=u.user_id
+        <where>
+            <if test="content !=null and content!=''">
+                d.content like concat('%',#{content},'%')
+            </if>
+        </where>
+        order by d.stick asc,d.refresh_time desc
+    </select>
+
+    <select id="selectDynamicCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from dynamic where stick =#{stick}
+        <if test="stick == '1'">
+            and (now() > hot_time
+        </if>
+        <if test="stick == '2'">
+            and now() > stick_time)
+        </if>
+    </select>
+    <select id="selectRedMoneyDynamic" resultType="java.util.Map">
+        select d.dynamic_id dynamicId,d.user_id userId,d.category_id
+        categoryId,d.content,d.images,d.video,d.red_package_money redPackageMoney,d.red_package_number redPackageNumber,
+        DATE_FORMAT(d.hot_time,'%Y-%m-%d %H:%i:%s') hotTime,DATE_FORMAT(d.stick_time,'%Y-%m-%d %H:%i:%s')
+        stickTime,d.visit_number visitNumber,d.give_like_number giveLikeNumber,
+        d.collect_number collectNumber,DATE_FORMAT(d.addtime,'%Y-%m-%d %H:%i:%s')
+        addtime,DATE_FORMAT(d.updatetime,'%Y-%m-%d %H:%i:%s') updatetime,
+        d.stick,DATE_FORMAT(d.refresh_time,'%Y-%m-%d %H:%i:%s') refreshTime,u.head_image
+        headImage,u.nickname,u.vip,d.head_video
+        from dynamic d left join user u on d.user_id=u.user_id
+        order by d.stick asc,d.refresh_time desc
+    </select>
+
+</mapper>

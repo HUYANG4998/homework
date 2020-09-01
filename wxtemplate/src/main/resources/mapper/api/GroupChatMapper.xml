@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wxtemplate.wxtemplate.api.mapper.GroupChatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wxtemplate.wxtemplate.api.entity.GroupChat">
+        <id column="group_chat_id" property="groupChatId" />
+        <result column="user_id" property="userId" />
+        <result column="group_id" property="groupId" />
+        <result column="group_name" property="groupName" />
+        <result column="group_head_image" property="groupHeadImage" />
+        <result column="group_qr_code" property="groupQrCode" />
+        <result column="group_notice" property="groupNotice" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+    </resultMap>
+    <select id="selectGroupChatByGroupID" parameterType="java.lang.String" resultType="java.util.Map">
+        select group_chat_id,user_id,group_id,group_name,group_head_image,group_notice,group_qr_code,addtime,updatetime
+        from group_chat
+        where group_id=#{id}
+    </select>
+    <select id="selectByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+        select group_chat_id from group_chat where user_id=#{userId}
+    </select>
+    <select id="selectByUserIdAndGroupChatId" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select group_chat_id,user_id,group_id,group_name,group_head_image,addtime
+        from group_chat where group_chat_id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="">
+            #{item}
+        </foreach>
+        and user_id != #{userId}
+    </select>
+    <select id="selectGroupChatByUserId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select group_chat_id,user_id,group_id,group_name,group_head_image,addtime
+        from group_chat where user_id=#{userId}
+    </select>
+</mapper>
