@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.api.earn.mapper.EarnMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jeeplus.modules.shop.api.earn.entity.Earn">
+        <id column="earnid" property="earnid" />
+        <result column="content" property="content" />
+        <result column="price" property="price" />
+        <result column="userid" property="userId" />
+        <result column="earn" property="earn" />
+        <result column="addtime" property="addtime" />
+    </resultMap>
+    <select id="selectEarnByAddtime" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select earnid,content,price,earn,DATE_FORMAT(addtime,'%Y-%m-%d %H:%i:%s') addtime
+        from ts_earn
+        <where>
+            <if test="addtime!=null and addtime !=''">
+                addtime like '%${addtime}%'
+            </if>
+            <if test="userId!=null and userId!=''">
+                and userid=#{userId}
+            </if>
+        </where>
+        order by addtime desc
+    </select>
+    <select id="yesterdayEarnAndprice" parameterType="java.lang.String" resultType="java.lang.String">
+        select sum(price) yesterdayEarn
+        from ts_earn
+		where addtime like '%${addtime}%' and earn='1' and userid=#{userId}
+
+    </select>
+    <insert id="addEarn" parameterType="com.jeeplus.modules.shop.api.earn.entity.Earn">
+        insert into ts_earn
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="earnid !=null and earnid!=''">earnid,</if>
+            <if test="content !=null and content!=''">content,</if>
+            <if test="price !=null and price!=''">price,</if>
+            <if test="userId !=null and userId!=''">userid,</if>
+            <if test="earn !=null and earn!=''">earn,</if>
+            <if test="addtime !=null and addtime!=''">addtime</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="earnid !=null and earnid!=''">#{earnid},</if>
+            <if test="content !=null and content!=''">#{content},</if>
+            <if test="price !=null and price!=''">#{price},</if>
+            <if test="userId !=null and userId!=''">#{userId},</if>
+            <if test="earn !=null and earn!=''">#{earn},</if>
+            <if test="addtime !=null and addtime!=''">#{addtime}</if>
+        </trim>
+    </insert>
+</mapper>

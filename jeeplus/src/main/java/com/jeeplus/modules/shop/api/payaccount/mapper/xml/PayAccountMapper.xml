@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.api.payaccount.mapper.PayAccountMapper">
+    <resultMap id="BaseResultMap" type="com.jeeplus.modules.shop.api.payaccount.entity.PayAccount">
+        <id column="pay_id" property="payId" />
+        <result column="userid" property="userId" />
+        <result column="status" property="status" />
+        <result column="account" property="account" />
+        <result column="image" property="image" />
+        <result column="name" property="name" />
+        <result column="addtime" property="addtime" />
+        <result column="updatetime" property="updatetime" />
+        <result column="aliuserid" property="aliUserId" />
+        <result column="openid" property="openId" />
+    </resultMap>
+    <select id="selectPayAccountByStatus" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select pay_id,userid,status,account,image,name,addtime,updatetime,openid,aliuserid
+        from ts_pay where userid=#{userId} and status=#{status}
+    </select>
+    <insert id="addPayAccount" parameterType="com.jeeplus.modules.shop.api.payaccount.entity.PayAccount">
+        insert into ts_pay
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="payId !=null and payId!=''">pay_id,</if>
+            <if test="userId !=null and userId!=''">userid,</if>
+            <if test="status !=null and status!=''">status,</if>
+            <if test="account !=null and account!=''">account,</if>
+            <if test="image !=null and image">image,</if>
+            <if test="name !=null and name!=''">name,</if>
+            <if test="addtime !=null and addtime!=''">addtime,</if>
+            <if test="updatetime !=null and updatetime!=''">updatetime,</if>
+            <if test="aliUserId !=null and aliUserId!=''">aliuserid,</if>
+            <if test="openId !=null and openId!=''">openid</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="payId !=null and payId!=''">#{payId},</if>
+            <if test="userId !=null and userId!=''">#{userId},</if>
+            <if test="status !=null and status!=''">#{status},</if>
+            <if test="account !=null and account!=''">#{account},</if>
+            <if test="image !=null and image!=''">#{image},</if>
+            <if test="name !=null and name!=''">#{name},</if>
+            <if test="addtime !=null and addtime!=''">#{addtime},</if>
+            <if test="updatetime !=null and updatetime!=''">#{updatetime},</if>
+            <if test="aliUserId !=null and aliUserId!=''">#{aliUserId},</if>
+            <if test="openId !=null and openId!=''">#{openId}</if>
+        </trim>
+    </insert>
+    <update id="updatePayAccount" parameterType="com.jeeplus.modules.shop.api.payaccount.entity.PayAccount">
+        update ts_pay
+        <set>
+            <if test="account!=null and account!=''">account=#{account},</if>
+            <if test="image!=null and image!=''">image=#{image},</if>
+            <if test="name!=null and name!=''">name=#{name},</if>
+            <if test="updatetime!=null and updatetime!=''">updatetime=#{updatetime}</if>
+            <if test="aliUserId!=null and aliUserId!=''">aliuserid=#{aliUserId}</if>
+            <if test="openId!=null and openId!=''">openid=#{openId}</if>
+        </set>
+        where pay_id=#{payId}
+    </update>
+    <delete id="deletePayAccount" parameterType="java.lang.String">
+        delete from ts_pay
+        where pay_id=#{payId}
+    </delete>
+    <select id="selectPayAccountByPayId" parameterType="java.lang.String" resultMap="BaseResultMap">
+         select pay_id,userid,status,account,image,name,addtime,updatetime,openid,aliuserid
+        from ts_pay where pay_id=#{payId}
+    </select>
+
+
+</mapper>

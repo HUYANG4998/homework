@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.store.mapper.StoreMapper">
+    
+	<sql id="storeColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.phone AS "phone",
+		a.pwd AS "pwd",
+		a.money AS "money",
+		a.bao_money AS "baoMoney",
+		a.img AS "img",
+		a.wei_openid AS "weiOpenId",
+		a.qq_id AS "qqId",
+		a.update_by AS "updateBy.id",
+		a.is_ren AS "isRen",
+		a.is_shen AS "isShen",
+		a.real_name AS "realName",
+		a.crad AS "card",
+		a.card_z AS "cardZ",
+		a.card_f AS "cardF",
+		a.card_s AS "cardS",
+		a.men_img AS "menImg",
+		a.nei_img AS "neiImg",
+		a.ying_img AS "yingImg",
+		a.hang_img AS "hangImg",
+		a.pin_img AS "pinImg",
+		a.address AS "address",
+		a.address_detail AS "addressDetail",
+		a.lng AS "lng",
+		a.lat AS "lat",
+		a.star_num AS "starNum",
+		a.fen_num AS "fenNum",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.by_one AS "byOne",
+		a.by_two AS "byTwo",
+		a.by_three AS "byThree",
+		a.remarks AS "remarks",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.is_user AS "isUser",
+		a.num AS "num"
+	</sql>
+	
+	<sql id="storeJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="Store" >
+		SELECT 
+			<include refid="storeColumns"/>
+		FROM ts_store a
+		<include refid="storeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Store" >
+		SELECT 
+			<include refid="storeColumns"/>
+		FROM ts_store a
+		<include refid="storeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="name != null and name != ''">
+				AND a.name = #{name}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="pwd != null and pwd != ''">
+				AND a.pwd = #{pwd}
+			</if>
+			<if test="isRen != null and isRen != ''">
+				AND a.is_ren = #{isRen}
+			</if>
+			<if test="isShen != null and isShen != ''">
+				AND a.is_shen = #{isShen}
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address LIKE 
+					<if test="dbName == 'oracle'">'%'||#{address}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{address}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{address},'%')</if>
+			</if>
+			<if test="weiOpenId!=null and weiOpenId !=''">
+				and a.wei_openid=#{weiOpenId}
+			</if>
+			<if test="qqId!=null and qqId!=''">
+				and a.qq_id=#{qqId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.bao_money DESC
+			</otherwise>
+
+
+		</choose>
+	</select>
+	<!--<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>-->
+	
+	<select id="findAllList" resultType="Store" >
+		SELECT 
+			<include refid="storeColumns"/>
+		FROM ts_store a
+		<include refid="storeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ts_store(
+			id,
+			name,
+			phone,
+			pwd,
+			money,
+			bao_money,
+			img,
+			wei_openid,
+			qq_id,
+			update_by,
+			is_ren,
+			is_shen,
+			real_name,
+			crad,
+			card_z,
+			card_f,
+			card_s,
+			men_img,
+			nei_img,
+			ying_img,
+			hang_img,
+			pin_img,
+			address,
+			address_detail,
+			lng,
+			lat,
+			star_num,
+			fen_num,
+			create_date,
+			create_by,
+			by_one,
+			by_two,
+			by_three,
+			remarks,
+			update_date,
+			del_flag,
+			num,
+			is_user
+		) VALUES (
+			#{id},
+			#{name},
+			#{phone},
+			#{pwd},
+			#{money},
+			#{baoMoney},
+			#{img},
+			#{weiOpenId},
+			#{qqId},
+			#{updateBy.id},
+			#{isRen},
+			#{isShen},
+			#{realName},
+			#{card},
+			#{cardZ},
+			#{cardF},
+			#{cardS},
+			#{menImg},
+			#{neiImg},
+			#{yingImg},
+			#{hangImg},
+			#{pinImg},
+			#{address},
+			#{addressDetail},
+			#{lng},
+			#{lat},
+			#{starNum},
+			#{fenNum},
+			#{createDate},
+			#{createBy.id},
+			#{byOne},
+			#{byTwo},
+			#{byThree},
+			#{remarks},
+			#{updateDate},
+			#{delFlag},
+			#{num},
+			#{isUser}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ts_store SET 	
+			name = #{name},
+			phone = #{phone},
+			pwd = #{pwd},
+			money = #{money},
+			bao_money = #{baoMoney},
+			img = #{img},
+			wei_openid = #{weiOpenId},
+			qq_id = #{qqId},
+			update_by = #{updateBy.id},
+			is_ren = #{isRen},
+			is_shen = #{isShen},
+			real_name = #{realName},
+			crad = #{card},
+			card_z = #{cardZ},
+			card_f = #{cardF},
+			card_s = #{cardS},
+			men_img = #{menImg},
+			nei_img = #{neiImg},
+			ying_img = #{yingImg},
+			hang_img = #{hangImg},
+			pin_img = #{pinImg},
+			address = #{address},
+			address_detail = #{addressDetail},
+			lng = #{lng},
+			lat = #{lat},
+			star_num = #{starNum},
+			fen_num = #{fenNum},
+			by_one = #{byOne},
+			by_two = #{byTwo},
+			by_three = #{byThree},
+			remarks = #{remarks},
+			update_date = #{updateDate},
+			num=#{num}
+		WHERE id = #{id}
+	</update>
+	<select id="likeUserId" parameterType="java.lang.String" resultType="Store">
+		select *
+		from ts_store where id like '%${userId}%'
+	</select>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_store
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_store SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Store" statementType="STATEMENT">
+		select * FROM ts_store  where ${propertyName} = '${value}'
+	</select>
+	<select id="getStoreAndWares" parameterType="Store" resultType="Store">
+		select distinct(a.id)
+		from ts_store a left join ts_wares w on a.id=w.store_id
+		<where>
+			<if test="isShen!=null and isShen!=''">
+				and a.is_shen=#{isShen}
+			</if>
+			<if test="address!=null and address!=''">
+				and a.address like concat('%',#{address},'%')
+			</if>
+			<if test="name!=null and name!=''">
+				and ((a.name like concat('%',#{name},'%')) or (w.name like concat('%',#{name},'%')))
+			</if>
+		</where>
+
+	</select>
+	
+</mapper>

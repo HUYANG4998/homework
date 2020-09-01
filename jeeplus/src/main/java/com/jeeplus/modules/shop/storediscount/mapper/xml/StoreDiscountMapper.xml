@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.storediscount.mapper.StoreDiscountMapper">
+
+	<sql id="storeDiscountColumns">
+		a.id AS "id",
+		a.store_id AS "store.id",
+		a.man_money AS "manMoney",
+		a.msg AS "msg",
+		a.yes_no AS "yesNo",
+		a.discount_state AS "discountState",
+		a.discount_type AS "discountType",
+		a.wares_id AS "wares.id",
+		a.start_date AS "startDate",
+		a.end_date AS "endDate",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks",
+				
+		store.name AS "store.name",
+				
+				
+				
+				
+				
+				
+		wares.name AS "wares.name"
+	</sql>
+	
+	<sql id="storeDiscountJoins">
+		
+		LEFT JOIN ts_store store ON store.id = a.store_id
+		LEFT JOIN ts_wares wares ON wares.id = a.wares_id
+	</sql>
+	
+    
+	<select id="get" resultType="StoreDiscount" >
+		SELECT 
+			<include refid="storeDiscountColumns"/>
+		FROM ts_store_discount a
+		<include refid="storeDiscountJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="StoreDiscount" >
+		SELECT 
+			<include refid="storeDiscountColumns"/>
+		FROM ts_store_discount a
+		<include refid="storeDiscountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="store != null and store.id != null and store.id != ''">
+				AND a.store_id = #{store.id}
+			</if>
+			<if test="yesNo != null and yesNo != ''">
+				AND a.yes_no = #{yesNo}
+			</if>
+			<if test="discountState != null and discountState != ''">
+				AND a.discount_state = #{discountState}
+			</if>
+			<if test="discountType != null and discountType != ''">
+				AND a.discount_type = #{discountType}
+			</if>
+			<if test="wares != null and wares.id != null and wares.id != ''">
+				AND a.wares_id = #{wares.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="selectCurrentDiscounts" resultType="java.util.Map">
+		select IFNULL(store_id,'') storeId,IFNULL(wares_id,'') waresId,IFNULL(discount_type,'') discountType,IFNULL(man_money,'') manMoney,IFNULL(msg,'') msg,IFNULL(discount_state,'') discountState
+		from ts_store_discount where yes_no='1'
+
+	</select>
+	<select id="selectDiscountsNumber" resultType="java.lang.Integer">
+		select count(*) from ts_store_discount where yes_no='1'
+	</select>
+	
+	<select id="findAllList" resultType="StoreDiscount" >
+		SELECT 
+			<include refid="storeDiscountColumns"/>
+		FROM ts_store_discount a
+		<include refid="storeDiscountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ts_store_discount(
+			id,
+			store_id,
+			man_money,
+			msg,
+			yes_no,
+			discount_state,
+			discount_type,
+			wares_id,
+			start_date,
+			end_date,
+			create_date,
+			create_by,
+			update_by,
+			update_date,
+			del_flag,
+			remarks
+		) VALUES (
+			#{id},
+			#{store.id},
+			#{manMoney},
+			#{msg},
+			#{yesNo},
+			#{discountState},
+			#{discountType},
+			#{wares.id},
+			#{startDate},
+			#{endDate},
+			#{createDate},
+			#{createBy.id},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ts_store_discount SET 	
+			store_id = #{store.id},
+			man_money = #{manMoney},
+			msg = #{msg},
+			yes_no = #{yesNo},
+			discount_state = #{discountState},
+			discount_type = #{discountType},
+			wares_id = #{wares.id},
+			start_date = #{startDate},
+			end_date = #{endDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_store_discount
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_store_discount SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="StoreDiscount" statementType="STATEMENT">
+		select * FROM ts_store_discount  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.order.mapper.OrderMapper">
+
+	<sql id="orderColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.numbers AS "numbers",
+		a.total_price AS "totalPrice",
+		a.pay_type AS "payType",
+		a.customer_id AS "customer.id",
+		a.address_id AS "customerAddress.id",
+		a.pay_time AS "payTime",
+		a.pei_type AS "peiType",
+		a.order_state AS "orderState",
+		a.count AS "count",
+		a.store_state AS "storeState",
+		a.rider_state AS "riderState",
+		a.create_date AS "createDate",
+		a.store_id AS "store.id",
+		a.rider_id AS "rider.id",
+		a.rider_jie_rime AS "riderJieTime",
+		a.song_time AS "songTime",
+		a.store_discount AS "storeDiscount",
+		a.wares_discount AS "waresDiscount",
+		a.store_discount_detail AS "storeDiscountDetail",
+		a.wares_discount_detail AS "waresDiscountDetail",
+		a.total_pei AS "totalPei",
+		a.by_one AS "byOne",
+		a.by_two AS "byTwo",
+		a.by_three AS "byThree",
+		a.pick_code AS "pickCode",
+		a.express_id AS "express.id",
+		a.express_numbers AS "expressNumbers",
+		a.total_distance AS "totalDistance",
+		a.remarks AS "remarks",
+		a.audit AS "audit",
+		DATE_FORMAT(a.deliverytime,'%Y-%m-%d %H:%i:%s') AS "deliverytime",
+		ridersettlement AS "ridersettlement",
+
+
+
+
+
+
+
+		customer.name AS "customer.name",
+		customer.img AS "customer.img",
+
+		customerAddress.address AS "customerAddress.address",
+		customerAddress.name AS "customerAddress.name",
+		customerAddress.lng AS "customerAddress.lng",
+		customerAddress.lat AS "customerAddress.lat",
+		customerAddress.address_detail AS "customerAddress.address_detail",
+		customerAddress.phone AS "customerAddress.phone",
+
+
+
+
+
+
+
+
+		store.name AS "store.name",
+		store.img AS "store.img",
+		store.lng AS "store.lng",
+		store.phone AS "store.phone",
+		store.lat AS "store.lat",
+		store.address AS "store.address",
+		store.address_detail AS "store.addressDetail",
+
+		rider.name AS "rider.name",
+		rider.phone AS "rider.phone",
+		rider.img AS "rider.img",
+
+
+
+
+
+
+
+
+
+
+
+
+		express.name AS "express.name"
+	</sql>
+
+	<sql id="orderJoins">
+
+		LEFT JOIN ts_customer customer ON customer.id = a.customer_id
+		LEFT JOIN ts_customer_address customerAddress ON customerAddress.id = a.address_id
+		LEFT JOIN ts_store store ON store.id = a.store_id
+		LEFT JOIN ts_rider rider ON rider.id = a.rider_id
+		LEFT JOIN ts_express express ON express.id = a.express_id
+	</sql>
+
+
+	<select id="get" resultType="Order" >
+		SELECT
+			<include refid="orderColumns"/>
+		FROM ts_order a
+		<include refid="orderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Order" >
+		SELECT
+			<include refid="orderColumns"/>
+		FROM ts_order a
+		<include refid="orderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="numbers != null and numbers != ''">
+				AND a.numbers = #{numbers}
+			</if>
+			<if test="payType != null and payType != ''">
+				AND a.pay_type = #{payType}
+			</if>
+			<if test="customer != null and customer.id != null and customer.id != ''">
+				AND a.customer_id = #{customer.id}
+			</if>
+			<if test="customerAddress != null and customerAddress.id != null and customerAddress.id != ''">
+				AND a.address_id = #{customerAddress.id}
+			</if>
+			<if test="peiType != null and peiType != ''">
+				AND a.pei_type = #{peiType}
+			</if>
+			<if test="orderState != null and orderState != ''">
+				AND a.order_state = #{orderState}
+			</if>
+			<if test="storeState != null and storeState != ''">
+				AND a.store_state = #{storeState}
+			</if>
+			<if test="riderState != null and riderState != ''">
+				AND a.rider_state = #{riderState}
+			</if>
+			<if test="store != null and store.id != null and store.id != ''">
+				AND a.store_id = #{store.id}
+			</if>
+			<if test="rider != null and rider.id != null and rider.id != ''">
+				AND a.rider_id = #{rider.id}
+			</if>
+			<if test="express != null and express.id != null and express.id != ''">
+				AND a.express_id = #{express.id}
+			</if>
+			<if test="expressNumbers != null and expressNumbers != ''">
+				AND a.express_numbers = #{expressNumbers}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date like '%${createDate}%'
+			</if>
+			<if test="audit !=null and audit!=''">
+				and a.audit = #{audit}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findListOrder" parameterType="java.lang.String" resultType="com.jeeplus.modules.shop.order.entity.Order">
+		select id,by_one from ts_order where create_date like '%${createDate}%' and store_id=#{storeId}
+	</select>
+
+	<select id="findAllList" resultType="Order" >
+		SELECT
+			<include refid="orderColumns"/>
+		FROM ts_order a
+		<include refid="orderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ts_order(
+			id,
+			create_by,
+			update_by,
+			update_date,
+			del_flag,
+			numbers,
+			total_price,
+			pay_type,
+			customer_id,
+			address_id,
+			pay_time,
+			pei_type,
+			order_state,
+			count,
+			store_state,
+			rider_state,
+			create_date,
+			store_id,
+			rider_id,
+			rider_jie_rime,
+			song_time,
+			store_discount,
+			wares_discount,
+			store_discount_detail,
+			wares_discount_detail,
+			total_pei,
+			by_one,
+			by_two,
+			by_three,
+			pick_code,
+			express_id,
+			express_numbers,
+			total_distance,
+			remarks,
+			audit,
+			deliverytime,
+			ridersettlement
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{numbers},
+			#{totalPrice},
+			#{payType},
+			#{customer.id},
+			#{customerAddress.id},
+			#{payTime},
+			#{peiType},
+			#{orderState},
+			#{count},
+			#{storeState},
+			#{riderState},
+			#{createDate},
+			#{store.id},
+			#{rider.id},
+			#{riderJieTime},
+			#{songTime},
+			#{storeDiscount},
+			#{waresDiscount},
+			#{storeDiscountDetail},
+			#{waresDiscountDetail},
+			#{totalPei},
+			#{byOne},
+			#{byTwo},
+			#{byThree},
+			#{pickCode},
+			#{express.id},
+			#{expressNumbers},
+			#{totalDistance},
+			#{remarks},
+			#{audit},
+			#{deliverytime},
+			#{ridersettlement}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ts_order SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			numbers = #{numbers},
+			total_price = #{totalPrice},
+			pay_type = #{payType},
+			customer_id = #{customer.id},
+			address_id = #{customerAddress.id},
+			pay_time = #{payTime},
+			pei_type = #{peiType},
+			order_state = #{orderState},
+			count = #{count},
+			store_state = #{storeState},
+			rider_state = #{riderState},
+			store_id = #{store.id},
+			rider_id = #{rider.id},
+			rider_jie_rime = #{riderJieTime},
+			song_time = #{songTime},
+			store_discount = #{storeDiscount},
+			wares_discount = #{waresDiscount},
+			store_discount_detail = #{storeDiscountDetail},
+			wares_discount_detail = #{waresDiscountDetail},
+			total_pei = #{totalPei},
+			by_one = #{byOne},
+			by_two = #{byTwo},
+			by_three = #{byThree},
+			pick_code = #{pickCode},
+			express_id = #{express.id},
+			express_numbers = #{expressNumbers},
+			total_distance = #{totalDistance},
+			remarks = #{remarks},
+			audit = #{audit},
+			deliverytime=#{deliverytime},
+			ridersettlement=#{ridersettlement}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_order
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_order SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Order" statementType="STATEMENT">
+		select * FROM ts_order  where ${propertyName} = '${value}'
+	</select>
+	<select id="selectOrderByNumber" parameterType="java.lang.String" resultType="Order">
+		SELECT <include refid="orderColumns"/>
+		FROM ts_order a
+		<include refid="orderJoins"/>
+		WHERE a.numbers = #{number}
+	</select>
+	<select id="findPageList" parameterType="Order" resultType="Order">
+		select distinct(o.id) from ts_order o
+		left join ts_order_detail d on d.order_id=o.id
+		left join ts_wares w on d.wares_id=w.id
+		<where>
+			<if test="orderState!=null and orderState !=''">and o.order_state=#{orderState}</if>
+			<if test="storeState !=null and storeState !=''">
+
+				<choose>
+					<when test='orderState =="1" and storeState !="2"'>
+						and (o.store_state='0' or o.store_state='1')
+					</when>
+					<otherwise>
+						and o.store_state=#{storeState}
+					</otherwise>
+				</choose>
+			</if>
+			<if test="customer.id!=null and customer.id!=''">
+				and o.customer_id=#{customer.id}
+			</if>
+			<if test="remarks!=null and remarks !=''">
+				and w.name like concat('%',#{remarks},'%')
+			</if>
+		</where>
+		order by o.create_date desc
+	</select>
+
+</mapper>

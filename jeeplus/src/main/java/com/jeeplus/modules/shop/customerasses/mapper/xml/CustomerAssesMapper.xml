@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.customerasses.mapper.CustomerAssesMapper">
+    
+	<sql id="customerAssesColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.customer_id AS "customer.id",
+		a.wares_id AS "wares.id",
+		a.contents AS "contents",
+		a.img AS "img",
+		a.yes_no AS "yesNo",
+		a.name AS "name",
+		a.order_id AS "orderId",
+		a.star AS "star",
+		a.desc_con AS "descCon",
+		a.service_att AS "serviceAtt",
+		a.create_date AS "createDate",
+		a.remarks AS "remarks",
+				
+				
+				
+				
+				
+		customer.name AS "customer.name",
+		IFNULL(customer.img,'') AS "customer.img",
+				
+		wares.name AS "wares.name"
+	</sql>
+	
+	<sql id="customerAssesJoins">
+		
+		LEFT JOIN ts_customer customer ON customer.id = a.customer_id
+		LEFT JOIN ts_wares wares ON wares.id = a.wares_id
+
+	</sql>
+	
+    
+	<select id="get" resultType="CustomerAsses" >
+		SELECT 
+			<include refid="customerAssesColumns"/>
+		FROM ts_customer_asses a
+		<include refid="customerAssesJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CustomerAsses" >
+		SELECT 
+			<include refid="customerAssesColumns"/>
+		FROM ts_customer_asses a
+		<include refid="customerAssesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="customer != null and customer.id != null and customer.id != ''">
+				AND a.customer_id = #{customer.id}
+			</if>
+			<if test="wares != null and wares.id != null and wares.id != ''">
+				AND a.wares_id = #{wares.id}
+			</if>
+			<if test="yesNo != null and yesNo != ''">
+				AND a.yes_no = #{yesNo}
+			</if>
+			<if test="orderId != null and orderId != ''">
+				AND a.order_id = #{orderId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		<if test="pageSize!=null and pageNum!=null">
+			limit ${pageNum},${pageSize}
+		</if>
+	</select>
+	
+	<select id="findAllList" resultType="CustomerAsses" >
+		SELECT 
+			<include refid="customerAssesColumns"/>
+		FROM ts_customer_asses a
+		<include refid="customerAssesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ts_customer_asses(
+			id,
+			create_by,
+			update_by,
+			update_date,
+			del_flag,
+			customer_id,
+			wares_id,
+			contents,
+			img,
+			yes_no,
+			name,
+			order_id,
+			star,
+			desc_con,
+			service_att,
+			create_date,
+			remarks
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{customer.id},
+			#{wares.id},
+			#{contents},
+			#{img},
+			#{yesNo},
+			#{name},
+			#{orderId},
+			#{star},
+			#{descCon},
+			#{serviceAtt},
+			#{createDate},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ts_customer_asses SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			customer_id = #{customer.id},
+			wares_id = #{wares.id},
+			contents = #{contents},
+			img = #{img},
+			yes_no = #{yesNo},
+			name = #{name},
+			order_id = #{orderId},
+			star = #{star},
+			desc_con = #{descCon},
+			service_att = #{serviceAtt},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_customer_asses
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_customer_asses SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="CustomerAsses" statementType="STATEMENT">
+		select * FROM ts_customer_asses  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

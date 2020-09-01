@@ -1,0 +1,62 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.api.chat.mapper.ChatMapper">
+    <resultMap id="BaseResultMap" type="com.jeeplus.modules.shop.api.chat.entity.Chat">
+        <id column="chatid" property="chatid" />
+        <result column="form" property="form" />
+        <result column="goto" property="gotos" />
+        <result column="tostatus" property="tostatus" />
+        <result column="fromstatus" property="fromstatus" />
+        <result column="content" property="content" />
+        <result column="addtime" property="addtime" />
+        <result column="is_read" property="isRead" />
+        <result column="del_flag" property="delFlag" />
+        <result column="type" property="type" />
+
+
+    </resultMap>
+    <select id="selectByUseridAndStatus" parameterType="java.lang.String" resultType="java.util.Map">
+        select chatid,form,goto,tostatus,fromstatus,content,addtime,is_read from chat where
+        (form=#{userid} and fromstatus=#{status}) or (goto=#{userid} and tostatus=#{status}) order by addtime desc
+    </select>
+
+    <select id="selectByFormAndGotoCostomer" parameterType="java.lang.String" resultType="java.util.Map">
+        select chatid,content,DATE_FORMAT( addtime,'%Y-%m-%d %H:%i:%s') addtime,(select img from ts_customer where id=#{id}) img,del_flag delFlag,
+        (select name from ts_customer where id=#{id}) name,form,goto,tostatus,fromstatus
+        from chat where (form=#{id} and  goto=#{userid}) or (goto=#{id} and form=#{userid}) order by addtime desc limit 0,1
+    </select>
+    <select id="selectByFormAndGotoStore" parameterType="java.lang.String" resultType="java.util.Map">
+        select chatid,content,DATE_FORMAT( addtime,'%Y-%m-%d %H:%i:%s') addtime,(select img from ts_store where id=#{id}) img,del_flag delFlag,
+        (select name from ts_store where id=#{id}) name,form,goto,tostatus,fromstatus
+        from chat where (form=#{id} and  goto=#{userid}) or (goto=#{id} and form=#{userid}) order by addtime desc limit 0,1
+    </select>
+    <select id="selectByFormAndGotoRider" parameterType="java.lang.String" resultType="java.util.Map">
+        select chatid,content,DATE_FORMAT( addtime,'%Y-%m-%d %H:%i:%s') addtime,(select img from ts_rider where id=#{id}) img,del_flag delFlag,
+        (select name from ts_rider where id=#{id}) name,form,goto,tostatus,fromstatus
+        from chat where (form=#{id} and  goto=#{userid}) or (goto=#{id} and form=#{userid}) order by addtime desc limit 0,1
+    </select>
+    <select id="selectByFormAndGotoCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*)
+        from chat where ((form=#{id} and  goto=#{userid}) or (goto=#{id} and form=#{userid})) and is_read='0'
+    </select>
+    <select id="selectMessageByFormAndTo" parameterType="java.lang.String" resultType="java.util.Map">
+        select chatid,content,DATE_FORMAT( addtime,'%Y-%m-%d %H:%i:%s') addtime,form,goto,type,tostatus,fromstatus
+        from chat where (form=#{userid} and  goto=#{oppositeid}) or (goto=#{userid} and form=#{oppositeid}) order by addtime desc
+    </select>
+    <update id="updateByChatId" parameterType="com.jeeplus.modules.shop.api.chat.entity.Chat">
+        update chat
+        <set>
+            <if test="isRead!=null and isRead!=''">is_read=#{isRead},</if>
+            <if test="delFlag!=null and delFlag!=''">del_flag=#{delFlag}</if>
+        </set>
+        where chatid=#{chatid}
+    </update>
+    <select id="selectMessageNumber" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from chat
+        where (form=#{userid} or goto=#{userid}) and is_read='0'
+    </select>
+    <select id="selectMessageById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select chatid,form,fromstatus,goto,tostatus,content,addtime,is_read,del_flag,type
+        from chat where chatid=#{chatId}
+    </select>
+
+</mapper>

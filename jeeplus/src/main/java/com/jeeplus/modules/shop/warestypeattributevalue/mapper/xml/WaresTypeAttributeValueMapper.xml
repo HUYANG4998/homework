@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.warestypeattributevalue.mapper.WaresTypeAttributeValueMapper">
+    
+	<sql id="waresTypeAttributeValueColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.attribute_id AS "attributeKey.id",
+		a.attribute_value AS "attributeValue",
+		a.sort AS "sort",
+		a.create_date AS "createDate",
+		a.remarks AS "remarks",
+		a.img AS "img",
+				
+				
+				
+				
+		attributeKey.name AS "attributeKey.name"
+	</sql>
+	
+	<sql id="waresTypeAttributeValueJoins">
+		
+		LEFT JOIN ts_wares_type_attribute_key attributeKey ON attributeKey.id = a.attribute_id
+	</sql>
+	
+    
+	<select id="get" resultType="WaresTypeAttributeValue" >
+		SELECT 
+			<include refid="waresTypeAttributeValueColumns"/>
+		FROM ts_wares_type_attribute_value a
+		<include refid="waresTypeAttributeValueJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WaresTypeAttributeValue" >
+		SELECT 
+			<include refid="waresTypeAttributeValueColumns"/>
+		FROM ts_wares_type_attribute_value a
+		<include refid="waresTypeAttributeValueJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="attributeKey != null and attributeKey.id != null and attributeKey.id != ''">
+				AND a.attribute_id = #{attributeKey.id}
+			</if>
+		</where>
+
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<!--<otherwise>
+				ORDER BY a.sort asc
+			</otherwise>-->
+			<otherwise>
+				ORDER BY a.create_date asc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WaresTypeAttributeValue" >
+		SELECT 
+			<include refid="waresTypeAttributeValueColumns"/>
+		FROM ts_wares_type_attribute_value a
+		<include refid="waresTypeAttributeValueJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ts_wares_type_attribute_value(
+			id,
+			create_by,
+			update_by,
+			update_date,
+			del_flag,
+			attribute_id,
+			attribute_value,
+			sort,
+			create_date,
+			remarks,
+			img
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{attributeKey.id},
+			#{attributeValue},
+			#{sort},
+			#{createDate},
+			#{remarks},
+			#{img}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ts_wares_type_attribute_value SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			attribute_id = #{attributeKey.id},
+			attribute_value = #{attributeValue},
+			sort = #{sort},
+			remarks = #{remarks},
+			img = #{img}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_wares_type_attribute_value
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_wares_type_attribute_value SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="WaresTypeAttributeValue" statementType="STATEMENT">
+		select * FROM ts_wares_type_attribute_value  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

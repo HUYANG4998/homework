@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.waresspecs.mapper.WaresSpecsMapper">
+
+	<sql id="waresSpecsColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.wares_id AS "wares.id",
+		a.wares_specs AS "waresSpecs",
+		a.indexes AS "indexes",
+		a.wares_stock AS "waresStock",
+		a.wares_price AS "waresPrice",
+		a.remarks AS "remarks",
+		a.create_date AS "createDate"
+	</sql>
+
+	<sql id="waresSpecsJoins">
+
+	</sql>
+
+
+	<select id="get" resultType="WaresSpecs" >
+		SELECT
+			<include refid="waresSpecsColumns"/>
+		FROM ts_wares_specs a
+		<include refid="waresSpecsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="WaresSpecs" >
+		SELECT
+			<include refid="waresSpecsColumns"/>
+		FROM ts_wares_specs a
+		<include refid="waresSpecsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="wares != null and wares.id != null and wares.id != ''">
+				AND a.wares_id = #{wares.id}
+			</if>
+			<if test="indexes != null and indexes != ''">
+				AND a.indexes = #{indexes}
+			</if>
+			<if test="waresSpecs != null and waresSpecs != ''">
+				AND a.wares_specs = #{waresSpecs}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="WaresSpecs" >
+		SELECT
+			<include refid="waresSpecsColumns"/>
+		FROM ts_wares_specs a
+		<include refid="waresSpecsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ts_wares_specs(
+			id,
+			create_by,
+			update_by,
+			update_date,
+			del_flag,
+			wares_id,
+			wares_specs,
+			indexes,
+			wares_stock,
+			wares_price,
+			remarks,
+			create_date
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{wares.id},
+			#{waresSpecs},
+			#{indexes},
+			#{waresStock},
+			#{waresPrice},
+			#{remarks},
+			#{createDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ts_wares_specs SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			wares_id = #{wares.id},
+			wares_specs = #{waresSpecs},
+			indexes = #{indexes},
+			wares_stock = #{waresStock},
+			wares_price = #{waresPrice},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_wares_specs
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_wares_specs SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="WaresSpecs" statementType="STATEMENT">
+		select * FROM ts_wares_specs  where ${propertyName} = '${value}'
+	</select>
+	<delete id="deleteByWaresId" parameterType="java.util.Map">
+		delete from ts_wares_specs
+		where wares_id=#{waresId}
+		and id not IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

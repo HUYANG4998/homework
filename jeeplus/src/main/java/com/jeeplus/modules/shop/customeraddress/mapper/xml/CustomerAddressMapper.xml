@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.customeraddress.mapper.CustomerAddressMapper">
+
+	<sql id="customerAddressColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.customer_id AS "customer.id",
+		a.customer_sex AS "customerSex",
+		a.phone AS "phone",
+		a.address AS "address",
+		a.address_type AS "addressType",
+		a.address_detail AS "addressDetail",
+		a.lng AS "lng",
+		a.lat AS "lat",
+		a.yes_no AS "yesNo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+
+
+		customer.name AS "customer.name"
+	</sql>
+
+	<sql id="customerAddressJoins">
+
+		LEFT JOIN ts_customer customer ON customer.id = a.customer_id
+	</sql>
+
+
+	<select id="get" resultType="CustomerAddress" >
+		SELECT
+			<include refid="customerAddressColumns"/>
+		FROM ts_customer_address a
+		<include refid="customerAddressJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CustomerAddress" >
+		SELECT
+			<include refid="customerAddressColumns"/>
+		FROM ts_customer_address a
+		<include refid="customerAddressJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="customer != null and customer.id != null and customer.id != ''">
+				AND a.customer_id = #{customer.id}
+			</if>
+			<if test="customerSex != null and customerSex != ''">
+				AND a.customer_sex = #{customerSex}
+			</if>
+			<if test="yesNo != null and yesNo != ''">
+				AND a.yes_no = #{yesNo}
+			</if>
+
+			<if test="phone != null and phone != ''">
+				AND a.phone LIKE
+					<if test="dbName == 'oracle'">'%'||#{phone}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{phone}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{phone},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CustomerAddress" >
+		SELECT
+			<include refid="customerAddressColumns"/>
+		FROM ts_customer_address a
+		<include refid="customerAddressJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ts_customer_address(
+			id,
+			name,
+			customer_id,
+			customer_sex,
+			phone,
+			address,
+			address_type,
+			address_detail,
+			lng,
+			lat,
+			yes_no,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{customer.id},
+			#{customerSex},
+			#{phone},
+			#{address},
+			#{addressType},
+			#{addressDetail},
+			#{lng},
+			#{lat},
+			#{yesNo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ts_customer_address SET
+			name = #{name},
+			customer_id = #{customer.id},
+			customer_sex = #{customerSex},
+			phone = #{phone},
+			address = #{address},
+			address_type = #{addressType},
+			address_detail = #{addressDetail},
+			lng = #{lng},
+			lat = #{lat},
+			yes_no = #{yesNo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_customer_address
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_customer_address SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="CustomerAddress" statementType="STATEMENT">
+		select * FROM ts_customer_address  where ${propertyName} = '${value}'
+	</select>
+
+</mapper>

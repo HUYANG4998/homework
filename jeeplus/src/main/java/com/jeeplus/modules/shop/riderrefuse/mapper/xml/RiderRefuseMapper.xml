@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.riderrefuse.mapper.RiderRefuseMapper">
+
+	<sql id="riderRefuseColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.rider_id AS "rider.id",
+		a.order_id AS "order.id",
+		a.create_date AS "createDate",
+		a.remarks AS "remarks",
+
+
+
+
+
+		rider.name AS "rider.name",
+		rider.img AS "rider.img",
+
+		order.numbers AS "order.numbers"
+	</sql>
+
+	<sql id="riderRefuseJoins">
+
+		LEFT JOIN ts_rider rider ON rider.id = a.rider_id
+		LEFT JOIN ts_order order ON order.id = a.order_id
+	</sql>
+
+
+	<select id="get" resultType="RiderRefuse" >
+		SELECT
+			<include refid="riderRefuseColumns"/>
+		FROM ts_rider_refuse a
+		<include refid="riderRefuseJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="RiderRefuse" >
+		SELECT
+			<include refid="riderRefuseColumns"/>
+		FROM ts_rider_refuse a
+		<include refid="riderRefuseJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="rider != null and rider.id != null and rider.id != ''">
+				AND a.rider_id = #{rider.id}
+			</if>
+			<if test="order != null and order.id != null and order.id != ''">
+				AND a.order_id = #{order.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="RiderRefuse" >
+		SELECT
+			<include refid="riderRefuseColumns"/>
+		FROM ts_rider_refuse a
+		<include refid="riderRefuseJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ts_rider_refuse(
+			id,
+			create_by,
+			update_by,
+			update_date,
+			del_flag,
+			rider_id,
+			order_id,
+			create_date,
+			remarks
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{rider.id},
+			#{order.id},
+			#{createDate},
+			#{remarks}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ts_rider_refuse SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			rider_id = #{rider.id},
+			order_id = #{order.id},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_rider_refuse
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_rider_refuse SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="RiderRefuse" statementType="STATEMENT">
+		select * FROM ts_rider_refuse  where ${propertyName} = '${value}'
+	</select>
+
+	<!-- 查询今天之内骑手拒绝了几个订单-->
+	<select id="findTodayList" resultType="java.lang.Integer" >
+		SELECT count(*) FROM ts_rider_refuse a  WHERE TO_DAYS(a.create_date) =TO_DAYS(NOW()) and a.rider_id = #{rider_id}
+	</select>
+</mapper>

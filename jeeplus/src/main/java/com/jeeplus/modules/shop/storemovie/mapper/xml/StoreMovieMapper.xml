@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.storemovie.mapper.StoreMovieMapper">
+
+	<sql id="storeMovieColumns">
+		a.id AS "id",
+		a.del_flag AS "delFlag",
+		a.store_id AS "store.id",
+		a.title AS "title",
+		a.movie AS "movie",
+		a.movie_img AS "movieImg",
+		a.dian_num AS "dianNum",
+		a.ping_num AS "pingNum",
+		a.by_one AS "byOne",
+		a.by_two AS "byTwo",
+		a.by_three AS "byThree",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.remarks AS "remarks",
+
+
+		store.name AS "store.name",
+		store.img AS "store.img"
+	</sql>
+
+	<sql id="storeMovieJoins">
+
+		LEFT JOIN ts_store store ON store.id = a.store_id
+	</sql>
+
+
+	<select id="get" resultType="StoreMovie" >
+		SELECT
+			<include refid="storeMovieColumns"/>
+		FROM ts_store_movie a
+		<include refid="storeMovieJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="StoreMovie" >
+		SELECT
+			<include refid="storeMovieColumns"/>
+		FROM ts_store_movie a
+		<include refid="storeMovieJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="store != null">
+				<if test="store.id != null and store.id != ''">
+					AND a.store_id = #{store.id}
+				</if>
+				<if test="store.name !=null and store.name !=''">
+					AND store.name=#{store.name}
+				</if>
+				<if test="store.address !=null and store.address !=''">
+					AND store.address like concat('%',#{store.address},'%')
+				</if>
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title like concat('%',#{title},'%')
+			</if>
+
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="StoreMovie" >
+		SELECT
+			<include refid="storeMovieColumns"/>
+		FROM ts_store_movie a
+		<include refid="storeMovieJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ts_store_movie(
+			id,
+			del_flag,
+			store_id,
+			title,
+			movie,
+			movie_img,
+			dian_num,
+			ping_num,
+			by_one,
+			by_two,
+			by_three,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			remarks
+		) VALUES (
+			#{id},
+			#{delFlag},
+			#{store.id},
+			#{title},
+			#{movie},
+			#{movieImg},
+			#{dianNum},
+			#{pingNum},
+			#{byOne},
+			#{byTwo},
+			#{byThree},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{remarks}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ts_store_movie SET
+			store_id = #{store.id},
+			title = #{title},
+			movie = #{movie},
+			movie_img = #{movieImg},
+			dian_num = #{dianNum},
+			ping_num = #{pingNum},
+			by_one = #{byOne},
+			by_two = #{byTwo},
+			by_three = #{byThree},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_store_movie
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_store_movie SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="StoreMovie" statementType="STATEMENT">
+		select * FROM ts_store_movie  where ${propertyName} = '${value}'
+	</select>
+	<select id="findListFoccus" parameterType="StoreMovie" resultType="StoreMovie">
+		select a.id AS "id",
+		a.del_flag AS "delFlag",
+		a.store_id AS "store.id",
+		a.title AS "title",
+		a.movie AS "movie",
+		a.movie_img AS "movieImg",
+		a.dian_num AS "dianNum",
+		a.ping_num AS "pingNum",
+		a.by_one AS "byOne",
+		a.by_two AS "byTwo",
+		a.by_three AS "byThree",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.remarks AS "remarks"
+		from ts_store_movie a
+		<where>
+			a.store_id IN
+			<foreach collection="idList" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+		</where>
+	</select>
+
+</mapper>

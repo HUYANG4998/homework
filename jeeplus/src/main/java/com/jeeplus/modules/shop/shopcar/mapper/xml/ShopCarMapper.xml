@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.shopcar.mapper.ShopCarMapper">
+
+	<sql id="shopCarColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.customer_id AS "customer.id",
+		a.store_id AS "store.id",
+		a.wares_id AS "wares.id",
+		a.name AS "name",
+		a.price AS "price",
+		a.wares_price AS "waresPrice",
+		a.num AS "num",
+		a.title AS "title",
+		specs.id AS "guige",
+		/*a.guige AS "guigeid",*/
+
+
+
+
+
+
+		customer.name AS "customer.name",
+
+		store.name AS "store.name",
+		store.img AS "store.img",
+
+		wares.name AS "wares.name",
+		wares.img AS "wares.img"
+
+	</sql>
+
+	<sql id="shopCarJoins">
+
+		LEFT JOIN ts_customer customer ON customer.id = a.customer_id
+		LEFT JOIN ts_store store ON store.id = a.store_id
+		LEFT JOIN ts_wares wares ON wares.id = a.wares_id
+		LEFT JOIN ts_wares_specs specs on specs.id=a.guige
+	</sql>
+
+
+	<select id="get" resultType="ShopCar" >
+		SELECT
+			<include refid="shopCarColumns"/>
+		FROM ts_shop_car a
+		<include refid="shopCarJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="ShopCar" >
+		SELECT
+			<include refid="shopCarColumns"/>
+		FROM ts_shop_car a
+		<include refid="shopCarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="customer != null and customer.id != null and customer.id != ''">
+				AND a.customer_id = #{customer.id}
+			</if>
+			<if test="store != null and store.id != null and store.id != ''">
+				AND a.store_id = #{store.id}
+			</if>
+			<if test="wares != null and wares.id != null and wares.id != ''">
+				AND a.wares_id = #{wares.id}
+			</if>
+			<if test="guige != null and guige != ''">
+				AND a.guige = #{guige}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="ShopCar" >
+		SELECT
+			<include refid="shopCarColumns"/>
+		FROM ts_shop_car a
+		<include refid="shopCarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ts_shop_car(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			customer_id,
+			store_id,
+			wares_id,
+			name,
+			price,
+			wares_price,
+			num,
+			title,
+			guige
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{customer.id},
+			#{store.id},
+			#{wares.id},
+			#{name},
+			#{price},
+			#{waresPrice},
+			#{num},
+			#{title},
+			#{guige}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ts_shop_car SET
+		<if test="guige!=null and guige!=''">guige = #{guige},</if>
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			customer_id = #{customer.id},
+			store_id = #{store.id},
+			wares_id = #{wares.id},
+			name = #{name},
+			price = #{price},
+			wares_price = #{waresPrice},
+			num = #{num},
+			title = #{title}
+
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_shop_car
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_shop_car SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="ShopCar" statementType="STATEMENT">
+		select * FROM ts_shop_car  where ${propertyName} = '${value}'
+	</select>
+
+</mapper>

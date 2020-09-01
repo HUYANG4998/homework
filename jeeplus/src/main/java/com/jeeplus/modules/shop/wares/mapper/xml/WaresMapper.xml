@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.wares.mapper.WaresMapper">
+
+	<sql id="waresColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.store_id AS "store.id",
+		a.name AS "name",
+		a.wares_type_id AS "waresType.id",
+		a.title AS "title",
+		a.price AS "price",
+		a.movie AS "movie",
+		a.img AS "img",
+		a.description AS "description",
+		a.d_img AS "dImg",
+		a.is_shang AS "isShang",
+		a.is_you AS "isYou",
+		a.sale_num AS "saleNum",
+		a.by_one AS "byOne",
+		a.stock AS "stock",
+		a.by_three AS "byThree",
+		a.attribute_list AS "attributeList",
+		a.remarks AS "remarks",
+
+
+
+
+
+
+		store.name AS "store.name",
+		store.is_shen As "store.isShen",
+
+
+		waresType.name AS "waresType.name"
+	</sql>
+
+	<sql id="waresJoins">
+
+		LEFT JOIN ts_store store ON store.id = a.store_id
+		LEFT JOIN ts_wares_type waresType ON waresType.id = a.wares_type_id
+	</sql>
+
+
+	<select id="get" resultType="Wares" >
+		SELECT
+			<include refid="waresColumns"/>
+		FROM ts_wares a
+		<include refid="waresJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Wares" >
+		SELECT
+			<include refid="waresColumns"/>
+		FROM ts_wares a
+		<include refid="waresJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="store != null and store.id != null and store.id != ''">
+				AND a.store_id = #{store.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name like concat('%',#{name},'%')
+			</if>
+			<if test="waresType != null and waresType.id != null and waresType.id != ''">
+				AND a.wares_type_id = #{waresType.id}
+			</if>
+			<if test="isShang != null and isShang != ''">
+				AND a.is_shang = #{isShang}
+			</if>
+			<if test="byOne != null and byOne != ''">
+				AND a.by_one = #{byOne}
+			</if>
+			<if test="isYou != null and isYou != ''">
+				AND a.is_you = #{isYou}
+			</if>
+			<if test="idList != null and isYou != ''">
+				AND a.is_you = #{isYou}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+	<select id="findWaresByStore" resultType="Wares" >
+		SELECT
+		<include refid="waresColumns"/>
+		FROM ts_wares a
+		<include refid="waresJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="store != null and store.id != null and store.id != ''">
+				AND a.store_id = #{store.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name like concat('%',#{name},'%')
+			</if>
+			<if test="waresType != null and waresType.id != null and waresType.id != ''">
+				AND a.wares_type_id = #{waresType.id}
+			</if>
+			<if test="isShang != null and isShang != ''">
+				AND a.is_shang = #{isShang}
+			</if>
+			<if test="isYou != null and isYou != ''">
+				AND a.is_you = #{isYou}
+			</if>
+			<if test="byOne !=null and byOne!=''">
+				AND a.by_one=#{byOne}
+			</if>
+			and a.store_id IN
+			<foreach collection="idList" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="Wares" >
+		SELECT
+			<include refid="waresColumns"/>
+		FROM ts_wares a
+		<include refid="waresJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ts_wares(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			store_id,
+			name,
+			wares_type_id,
+			title,
+			price,
+			movie,
+			img,
+			description,
+			d_img,
+			is_shang,
+			is_you,
+			sale_num,
+			by_one,
+			stock,
+			by_three,
+			attribute_list,
+			remarks
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{store.id},
+			#{name},
+			#{waresType.id},
+			#{title},
+			#{price},
+			#{movie},
+			#{img},
+			#{description},
+			#{dImg},
+			#{isShang},
+			#{isYou},
+			#{saleNum},
+			#{byOne},
+			#{stock},
+			#{byThree},
+			#{attributeList},
+			#{remarks}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ts_wares SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			store_id = #{store.id},
+
+
+
+
+			wares_type_id = #{waresType.id},
+			img = #{img},
+			description = #{description},
+			d_img = #{dImg},
+			is_shang = #{isShang},
+		<if test="isShang!=null and isShang!=''">name = #{name},</if>
+		<if test="title!=null and title!=''">title = #{title},</if>
+		<if test="price!=null and price!=''">price = #{price},</if>
+		<if test="movie!=null and movie!=''">movie = #{movie},</if>
+
+		<if test="isShang!=null and isShang!=''">is_shang = #{isShang},</if>
+		<if test="isYou!=null and isYou!=''">is_you = #{isYou},</if>
+		<if test="saleNum!=null and saleNum!=''">sale_num = #{saleNum},</if>
+			<if test="byOne!=null and byOne!=''">by_one = #{byOne},</if>
+			<if test="stock!=null and stock!=''">stock = #{stock},</if>
+			by_three = #{byThree},
+		attribute_list = #{attributeList},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_wares
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_wares SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Wares" statementType="STATEMENT">
+		select * FROM ts_wares  where ${propertyName} = '${value}'
+	</select>
+	<select id="getWaresByStoreIdAndName" parameterType="java.lang.String" resultType="Wares">
+		select a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.store_id AS "store.id",
+		a.name AS "name",
+		a.wares_type_id AS "waresType.id",
+		a.title AS "title",
+		a.price AS "price",
+		a.movie AS "movie",
+		a.img AS "img",
+		a.description AS "description",
+		a.d_img AS "dImg",
+		a.is_shang AS "isShang",
+		a.is_you AS "isYou",
+		a.sale_num AS "saleNum",
+		a.by_one AS "byOne",
+		a.stock AS "stock",
+		a.by_three AS "byThree",
+		a.attribute_list AS "attributeList",
+		a.remarks AS "remarks"
+		from ts_wares a where a.store_id=#{id} and a.name like concat('%',#{name},'%')
+	</select>
+
+</mapper>

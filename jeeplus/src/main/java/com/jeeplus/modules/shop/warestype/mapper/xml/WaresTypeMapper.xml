@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.warestype.mapper.WaresTypeMapper">
+    
+	<sql id="waresTypeColumns">
+		a.id AS "id",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.store_id AS "store.id",
+		a.name AS "name",
+		a.by_one AS "byOne",
+		a.by_two AS "byTwo",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+				
+				
+				
+				
+		store.name AS "store.name",
+		store.img AS "store.img"
+	</sql>
+	
+	<sql id="waresTypeJoins">
+		
+		LEFT JOIN ts_store store ON store.id = a.store_id
+	</sql>
+	
+    
+	<select id="get" resultType="WaresType" >
+		SELECT 
+			<include refid="waresTypeColumns"/>
+		FROM ts_wares_type a
+		<include refid="waresTypeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WaresType" >
+		SELECT 
+			<include refid="waresTypeColumns"/>
+		FROM ts_wares_type a
+		<include refid="waresTypeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="store != null and store.id != null and store.id != ''">
+				AND a.store_id = #{store.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WaresType" >
+		SELECT 
+			<include refid="waresTypeColumns"/>
+		FROM ts_wares_type a
+		<include refid="waresTypeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ts_wares_type(
+			id,
+			update_by,
+			update_date,
+			del_flag,
+			store_id,
+			name,
+			by_one,
+			by_two,
+			remarks,
+			create_by,
+			create_date
+		) VALUES (
+			#{id},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{store.id},
+			#{name},
+			#{byOne},
+			#{byTwo},
+			#{remarks},
+			#{createBy.id},
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ts_wares_type SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			store_id = #{store.id},
+			name = #{name},
+			by_one = #{byOne},
+			by_two = #{byTwo},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_wares_type
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_wares_type SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="WaresType" statementType="STATEMENT">
+		select * FROM ts_wares_type  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

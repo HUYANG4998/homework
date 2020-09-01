@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.customer.mapper.CustomerMapper">
+    
+	<sql id="customerColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.phone AS "phone",
+		a.pwd AS "pwd",
+		a.img AS "img",
+		a.wei_id AS "weiId",
+		a.qq_id AS "qqId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks",
+		a.by_one AS "byOne",
+		a.by_two AS "byTwo",
+		a.by_three AS "byThree",
+		a.is_user AS "isUser"
+	</sql>
+	
+	<sql id="customerJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="Customer" >
+		SELECT 
+			<include refid="customerColumns"/>
+		FROM ts_customer a
+		<include refid="customerJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Customer" >
+		SELECT 
+			<include refid="customerColumns"/>
+		FROM ts_customer a
+		<include refid="customerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="name != null and name != ''">
+				AND a.name = #{name}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="pwd != null and pwd != ''">
+				AND a.pwd = #{pwd}
+			</if>
+			<if test="weiId!=null and weiId !=''">
+				AND a.wei_id=#{weiId}
+			</if>
+			<if test="qqId !=null and qqId !=''">
+				AND a.qq_id=#{qqId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Customer" >
+		SELECT 
+			<include refid="customerColumns"/>
+		FROM ts_customer a
+		<include refid="customerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ts_customer(
+			id,
+			name,
+			phone,
+			pwd,
+			img,
+			wei_id,
+			qq_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			remarks,
+			by_one,
+			by_two,
+			by_three,
+			is_user
+		) VALUES (
+			#{id},
+			#{name},
+			#{phone},
+			#{pwd},
+			#{img},
+			#{weiId},
+			#{qqId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{remarks},
+			#{byOne},
+			#{byTwo},
+			#{byThree},
+			#{isUser}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ts_customer SET 	
+			name = #{name},
+			phone = #{phone},
+			pwd = #{pwd},
+			img = #{img},
+			wei_id = #{weiId},
+			qq_id = #{qqId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			by_one = #{byOne},
+			by_two = #{byTwo},
+			by_three = #{byThree}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_customer
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_customer SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Customer" statementType="STATEMENT">
+		select * FROM ts_customer  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

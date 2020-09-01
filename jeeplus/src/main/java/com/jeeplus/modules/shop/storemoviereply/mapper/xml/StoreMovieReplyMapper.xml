@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.storemoviereply.mapper.StoreMovieReplyMapper">
+
+	<sql id="storeMovieReplyColumns">
+		a.id AS "id",
+		a.movie_id AS "movie.id",
+		a.customer_id AS "customer.id",
+		a.last_id AS "lastId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.store_id AS "store.id",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.yes_no AS "yesNo",
+
+		movie.title AS "movie.title",
+
+		customer.name AS "customer.name",
+		customer.img AS "customer.img",
+
+
+
+
+
+
+		store.name AS "store.name",
+		store.img AS "store.img"
+	</sql>
+
+	<sql id="storeMovieReplyJoins">
+
+		LEFT JOIN ts_store_movie movie ON movie.id = a.movie_id
+		LEFT JOIN ts_customer customer ON customer.id = a.customer_id
+		LEFT JOIN ts_store store ON store.id = a.store_id
+	</sql>
+
+
+	<select id="get" resultType="StoreMovieReply" >
+		SELECT
+			<include refid="storeMovieReplyColumns"/>
+		FROM ts_store_movie_reply a
+		<include refid="storeMovieReplyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="StoreMovieReply" >
+		SELECT
+			<include refid="storeMovieReplyColumns"/>
+		FROM ts_store_movie_reply a
+		<include refid="storeMovieReplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="movie != null and movie.id != null and movie.id != ''">
+				AND a.movie_id = #{movie.id}
+			</if>
+			<if test="customer != null and customer.id != null and customer.id != ''">
+				AND a.customer_id = #{customer.id}
+			</if>
+			<if test="lastId != null and lastId != ''">
+				AND a.last_id = #{lastId}
+			</if>
+			<if test="store != null and store.id != null and store.id != ''">
+				AND a.store_id = #{store.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="StoreMovieReply" >
+		SELECT
+			<include refid="storeMovieReplyColumns"/>
+		FROM ts_store_movie_reply a
+		<include refid="storeMovieReplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ts_store_movie_reply(
+			id,
+			movie_id,
+			customer_id,
+			last_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			store_id,
+			remarks,
+			del_flag,
+			yes_no
+		) VALUES (
+			#{id},
+			#{movie.id},
+			#{customer.id},
+			#{lastId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{store.id},
+			#{remarks},
+			#{delFlag},
+			#{yesNo}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ts_store_movie_reply SET
+			movie_id = #{movie.id},
+			customer_id = #{customer.id},
+			last_id = #{lastId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			store_id = #{store.id},
+			remarks = #{remarks},
+			yes_no = #{yesNo}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_store_movie_reply
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_store_movie_reply SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="StoreMovieReply" statementType="STATEMENT">
+		select * FROM ts_store_movie_reply  where ${propertyName} = '${value}'
+	</select>
+
+	<!--查询动态且lastId为null的评论 -->
+	<select id="findAllByPropertyIdAndLastIdNull" resultType="StoreMovieReply">
+		SELECT
+		<include refid="storeMovieReplyColumns"/>
+		FROM ts_store_movie_reply a
+		<include refid="storeMovieReplyJoins"/>
+		WHERE movie_id = #{movie.id} and last_id is  null;
+	</select>
+	<!--查询动态且lastId不为null的评论 -->
+	<select id="findAllByPropertyIdAndLastIdNotNull" resultType="StoreMovieReply">
+		SELECT
+		<include refid="storeMovieReplyColumns"/>
+		FROM ts_store_movie_reply a
+		<include refid="storeMovieReplyJoins"/>
+		WHERE movie_id = #{movie.id} and last_id is not null;
+	</select>
+
+
+</mapper>

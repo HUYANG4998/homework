@@ -1,0 +1,40 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.api.deal.mapper.DealMapper">
+    <resultMap id="BaseResultMap" type="com.jeeplus.modules.shop.api.deal.entity.Deal">
+        <id column="deal_id" property="dealId" />
+        <result column="order_id" property="orderId" />
+        <result column="status" property="status" />
+        <result column="is_read" property="isRead" />
+        <result column="updatetime" property="updatetime" />
+    </resultMap>
+    <select id="selectDeal" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select d.deal_id deal_id,d.status status,d.is_read is_read,DATE_FORMAT(d.updatetime,'%Y-%m-%d %H:%i:%s') updatetime,d.order_id order_id
+        from ts_deal d left join ts_order o on d.order_id=o.id
+        where o.customer_id=#{userid}
+    </select>
+
+    <select id="selectOrderDetailByOrderId" parameterType="java.lang.String" resultType="java.util.Map">
+        select IFNULL(d.by_one,'') by_one,IFNULL(d.by_three,'') by_three,IFNULL(w.title,'') title
+        from ts_order_detail d left join ts_wares w on d.wares_id=w.id
+        where d.order_id=#{orderId}
+    </select>
+    <update id="updateByDealId" parameterType="com.jeeplus.modules.shop.api.deal.entity.Deal">
+        update ts_deal
+        <set>
+            <if test="status!=null and status!=''">status=#{status},</if>
+            <if test="isRead!=null and isRead!=''">is_read=#{isRead},</if>
+            <if test="updatetime!=null and updatetime!=''">updatetime=#{updatetime}</if>
+        </set>
+        where deal_id=#{dealId}
+    </update>
+    <select id="selectDealByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
+
+        select d.deal_id deal_id,d.status status,d.is_read is_read,DATE_FORMAT(d.updatetime,'%Y-%m-%d %H:%i:%s') updatetime,d.order_id order_id
+        from ts_deal d where d.order_id=#{orderId}
+    </select>
+    <select id="selectDealById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select d.deal_id deal_id,d.status status,d.is_read is_read,DATE_FORMAT(d.updatetime,'%Y-%m-%d %H:%i:%s') updatetime,d.order_id order_id
+        from ts_deal d where d.deal_id=#{dealId}
+    </select>
+
+</mapper>

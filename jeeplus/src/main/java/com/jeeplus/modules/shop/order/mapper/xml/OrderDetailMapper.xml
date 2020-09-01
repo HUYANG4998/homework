@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.shop.order.mapper.OrderDetailMapper">
+    
+	<sql id="orderDetailColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.wares_id AS "wares.id",
+		a.wares_price AS "waresPrice",
+		a.num AS "num",
+		a.total_price AS "totalPrice",
+		a.numbers AS "numbers",
+		a.order_id AS "order.id",
+		a.remarks AS "remarks",
+		a.by_one AS "byOne",
+		a.by_two AS "byTwo",
+		a.by_three AS "byThree",
+				
+				
+				
+				
+				
+				
+		wares.name AS "wares.name",
+		wares.img AS "wares.img",
+		wares.title AS "wares.title",
+		wares.description AS "wares.description",
+		wares.stock AS "wares.stock"
+	</sql>
+	
+	<sql id="orderDetailJoins">
+		
+		LEFT JOIN ts_wares wares ON wares.id = a.wares_id
+			LEFT JOIN ts_order b ON b.id = a.order_id
+	</sql>
+	
+    
+	<select id="get" resultType="OrderDetail" >
+		SELECT 
+			<include refid="orderDetailColumns"/>
+		FROM ts_order_detail a
+		<include refid="orderDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="OrderDetail" >
+		SELECT 
+			<include refid="orderDetailColumns"/>
+		FROM ts_order_detail a
+		<include refid="orderDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="wares != null and wares.id != null and wares.id != ''">
+				AND a.wares_id = #{wares.id}
+			</if>
+			<if test="numbers != null and numbers != ''">
+				AND a.numbers = #{numbers}
+			</if>
+			<if test="order != null and order.id != null and order.id != ''">
+				AND a.order_id = #{order.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="OrderDetail" >
+		SELECT 
+			<include refid="orderDetailColumns"/>
+		FROM ts_order_detail a
+		<include refid="orderDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ts_order_detail(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			wares_id,
+			wares_price,
+			num,
+			total_price,
+			numbers,
+			order_id,
+			remarks,
+			by_one,
+			by_two,
+			by_three
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{wares.id},
+			#{waresPrice},
+			#{num},
+			#{totalPrice},
+			#{numbers},
+			#{order.id},
+			#{remarks},
+			#{byOne},
+			#{byTwo},
+			#{byThree}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ts_order_detail SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			wares_id = #{wares.id},
+			wares_price = #{waresPrice},
+			num = #{num},
+			total_price = #{totalPrice},
+			numbers = #{numbers},
+			order_id = #{order.id},
+			remarks = #{remarks},
+			by_one = #{byOne},
+			by_two = #{byTwo},
+			by_three = #{byThree}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM ts_order_detail
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE order_id = #{order.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE ts_order_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE order_id = #{order.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="OrderDetail" statementType="STATEMENT">
+		select * FROM ts_order_detail  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

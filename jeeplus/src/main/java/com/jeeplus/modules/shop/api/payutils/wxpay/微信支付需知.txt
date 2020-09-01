@@ -1,0 +1,27 @@
+
+@Author Lhh
+@Time 2019/6/29
+
+    pom文件里 需引入
+	    jdom2  包
+        <dependency>
+                    <groupId>org.jdom</groupId>
+                    <artifactId>jdom2</artifactId>
+                    <version>2.0.6</version>
+        </dependency>
+    结构:
+
+	   entity:对应的一些实体类 和 公用的 工具类
+
+	   util :工具类
+
+	   入口文件:WXpayController
+
+	   WxConstUtil:微信的配置文件
+
+
+	   微信退款：
+	     TransferController  入口文件
+	     transfer 相关的一些util类
+
+
